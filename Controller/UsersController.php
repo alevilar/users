@@ -11,6 +11,7 @@
 
 App::uses('CakeEmail', 'Network/Email');
 App::uses('UsersAppController', 'Users.Controller');
+App::uses('MtSites', 'MtSites.Utility');
 
 /**
  * Users Users Controller
@@ -47,14 +48,35 @@ class UsersController extends UsersAppController {
  *
  * @var array
  */
-	public $components = array(
-		//'Auth',
+	public $components = array(		
 		'Session',
-		'Cookie',
-		'Paginator',
-		'Security',
+        'Cookie',
+        'RequestHandler',
+        'MtSites.MtSites',
+        'Auth' => array(
+            'loginAction' => array('plugin'=>'users','controller' => 'users', 'action' => 'login'),
+            'logoutRedirect' => array('plugin'=>'users','controller' => 'users', 'action' => 'login'),
+            'loginError' => 'Usuario o Contraseña Incorrectos',
+            'authError' => 'Usted no tiene permisos para acceder a esta página.', 
+            'authorize' => array('MtSites.MtSites'),
+            'authenticate' => array(
+                'Form' => array(
+                    'recursive' => 1
+                )
+            ),        
+        ),
+        'ExtAuth.ExtAuth',
+        'Paginator',      
+        'Search.Prg' => array(
+            'presetForm' => array(
+                'paramType' => 'querystring'
+                )
+            ),
+        
+        'Security',
 		'Users.RememberMe',
 	);
+
 
 /**
  * Preset vars

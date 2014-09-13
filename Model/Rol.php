@@ -1,11 +1,11 @@
 <?php
-App::uses('UsersAppModel', 'Users.Model');
+App::uses('AppTenantModel', 'Users.Model');
 /**
  * Rol Model
  *
  * @property User $User
  */
-class Rol extends UsersAppModel {
+class Rol extends AppTenantModel {
 /**
  * Display field
  *
