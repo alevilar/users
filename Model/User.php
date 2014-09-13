@@ -13,6 +13,7 @@ App::uses('Security', 'Utility');
 App::uses('UsersAppModel', 'Users.Model');
 App::uses('SearchableBehavior', 'Search.Model/Behavior');
 App::uses('SluggableBehavior', 'Utils.Model/Behavior');
+App::uses('MtSites', 'MtSites.Utility');
 
 /**
  * Users Plugin User Model
@@ -46,8 +47,55 @@ class User extends UsersAppModel {
  */
 	public $filterArgs = array(
 		'username' => array('type' => 'like'),
-		'email' => array('type' => 'value')
+		'email' => array('type' => 'value'),
+		'txt_buscar' => array(
+            'type' => 'query',
+            'method' => '__searchTextGeneric'
+            ),
+        'site_alias' => array(
+            'type' => 'query',
+            'method' => '__searchFromSite',
+            'field' => 'User.id',
+            ),
+        );
+
+
+/**
+ * hasMany associations
+ *
+ * @var array
+ */
+	public $hasMany = array(
+		'SocialProfile' => array(
+			'className' => 'Users.SocialProfile',
+			'foreignKey' => 'user_id',
+			'unique' => 'keepExisting',
+			'dependent' => true,
+		)
 	);
+
+
+/**
+ * hasAndBelongsToMany associations
+ *
+ * @var array
+ */
+	public $hasAndBelongsToMany = array(
+		'Site' => array(
+			'className' => 'MtSites.Site',
+			'joinTable' => 'sites_users',
+			'foreignKey' => 'user_id',
+			'associationForeignKey' => 'site_id',
+			'unique' => 'keepExisting',
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+		)
+	);
+
 
 /**
  * Displayfield
@@ -82,10 +130,7 @@ class User extends UsersAppModel {
 				'required' => true, 'allowEmpty' => false,
 				'message' => 'Please enter a username.'
 			),
-			'alpha' => array(
-				'rule' => array('alphaNumeric'),
-				'message' => 'The username must be alphanumeric.'
-			),
+			
 			'unique_username' => array(
 				'rule' => array('isUnique', 'username'),
 				'message' => 'This username is already in use.'
@@ -569,6 +614,10 @@ class User extends UsersAppModel {
 
 		$this->set($postData);
 		if ($this->validates()) {
+			if ( empty( $postData[$this->alias]['password'] )) {
+				// Oauth registering
+				$postData[$this->alias]['password'] = String::uuid();
+			}
 			$postData[$this->alias]['password'] = $this->hash($postData[$this->alias]['password'], 'sha1', true);
 			$this->create();
 			$this->data = $this->save($postData, false);

@@ -41,18 +41,6 @@ class UsersController extends UsersAppController {
  */
 	public $plugin = null;
 
-/**
- * Helpers
- *
- * @var array
- */
-	public $helpers = array(
-		'Html',
-		'Form',
-		'Session',
-		'Time',
-		'Text'
-	);
 
 /**
  * Components
@@ -60,7 +48,7 @@ class UsersController extends UsersAppController {
  * @var array
  */
 	public $components = array(
-		'Auth',
+		//'Auth',
 		'Session',
 		'Cookie',
 		'Paginator',
@@ -220,7 +208,7 @@ class UsersController extends UsersAppController {
 			return;
 		}
 
-		$this->Auth->allow('add', 'reset', 'verify', 'logout', 'view', 'reset_password', 'login', 'resend_verification');
+		$this->Auth->allow('add', 'reset', 'verify', 'logout', 'view', 'reset_password', 'login', 'resend_verification', 'auth_login', 'auth_callback');
 
 		if (!is_null(Configure::read('Users.allowRegistration')) && !Configure::read('Users.allowRegistration')) {
 			$this->Auth->deny('add');
@@ -232,6 +220,7 @@ class UsersController extends UsersAppController {
 
 		$this->Auth->authenticate = array(
 			'Form' => array(
+				'recursive' => 1,
 				'fields' => array(
 					'username' => 'email',
 					'password' => 'password'),
@@ -242,10 +231,6 @@ class UsersController extends UsersAppController {
 				)
 			)
 		);
-
-		$this->Auth->loginRedirect = '/';
-		$this->Auth->logoutRedirect = array('plugin' => Inflector::underscore($this->plugin), 'controller' => 'users', 'action' => 'login');
-		$this->Auth->loginAction = array('admin' => false, 'plugin' => Inflector::underscore($this->plugin), 'controller' => 'users', 'action' => 'login');
 	}
 
 /**
@@ -293,6 +278,21 @@ class UsersController extends UsersAppController {
  * @return void
  */
 	public function edit() {
+		$user = $this->Auth->user();
+		if ( empty($user) ) {
+			throw new ForbiddenException(__("You must be logged in"));
+		}
+        if ( $this->request->is('post') ) {
+                if ($this->User->save( $this->request->data) ) {
+                        $this->Session->setFlash(__('Se ha guardado la información correctamente'));
+                        $this->User->recursive = 1;
+                        $user = $this->User->read(null, $id);
+                        $this->Session->write('Auth.User', $user);
+                } else {
+                        $this->Session->setFlash(__('El usuario no pudo ser guardado. Por favor, intente nuevamente.'));
+                }
+        }
+        $this->request->data = $user;
 	}
 
 /**
@@ -504,6 +504,7 @@ class UsersController extends UsersAppController {
 					$this->redirect($this->Auth->redirect($data[$this->modelClass]['return_to']));
 				}
 			} else {
+				$this->Auth->flash['element'] = 'Risto.flash_error';
 				$this->Auth->flash(__d('users', 'Invalid e-mail / password combination. Please try again'));
 			}
 		}
@@ -876,5 +877,142 @@ class UsersController extends UsersAppController {
 	public function isAuthorized($user = null) {
 		return parent::isAuthorized($user);
 	}
+
+
+
+
+	/**
+	 * 
+	 * -------------------------------------------------------------------------------------------
+	 *
+	 * 				OAUTH
+	 */
+
+	public function auth_login($provider) {
+	    $result = $this->ExtAuth->login($provider);
+	    if ($result['success']) {
+	    	$Event = new CakeEvent(
+				'Users.Controller.Users.afterLogin',
+				$this,
+				array(
+					'data' => $this->request->data,
+					'isFirstLogin' => !$this->Auth->user('last_login')
+				)
+			);
+
+			$this->getEventManager()->dispatch($Event);
+
+	    	$this->Auth->loginRedirect = $result['redirectURL'];
+	        $this->redirect( $this->Auth->redirectUrl() );
+
+	    } else {
+	        $this->Session->setFlash($result['message']);
+	        $this->redirect($this->Auth->redirectUrl());
+	    }
+	}
+
+	public function auth_callback($provider) {
+	    $result = $this->ExtAuth->loginCallback($provider);
+	    if ($result['success']) {
+	        $this->__successfulExtAuth($result['profile'], $result['accessToken']);
+
+	    } else {
+	        $this->Session->setFlash($result['message']);
+	        $this->redirect($this->Auth->redirectUrl());
+	    }
+	}
+
+
+	private function __successfulExtAuth($incomingProfile, $accessToken) {
+
+	    // search for profile
+	    $this->User->SocialProfile->recursive = -1;
+	    $existingProfile = $this->User->SocialProfile->find('first', array(
+	        'conditions' => array('oid' => $incomingProfile['oid'])
+	    ));
+
+	    if ($existingProfile) {
+
+	        // Existing profile? log the associated user in.
+	        $user = $this->User->find('first', array(
+	            'conditions' => array('id' => $existingProfile['SocialProfile']['user_id'])
+	        ));
+
+	        $this->__doAuthLogin($user);
+	    } else {
+	    	// verificar que no se haya registrado con otra credencial
+	    	$existingUser = $this->User->find('first', array(
+		        'conditions' => array('email' => $incomingProfile['email'])
+		    ));
+		    if ( $existingUser ) {
+		    	// User exists but never (logged using oauth) saved UserProfile => save UserProfile
+	            $incomingProfile['user_id'] = $existingUser['User']['id'];
+	            $incomingProfile['last_login'] = date('Y-m-d h:i:s');
+	            $incomingProfile['access_token'] = serialize($accessToken);
+	            $this->User->SocialProfile->save($incomingProfile);
+	            $this->Session->setFlash(__('Your %s account has been linked to user %s.', $incomingProfile['provider'], $existingUser['User']['username']));
+
+	            // log in
+	            $this->__doAuthLogin($existingUser);
+
+	            $this->redirect($this->Auth->redirectUrl());
+		    }
+
+
+
+	        // New profile.
+	        if ($this->Auth->loggedIn()) {
+
+	            // user logged in already, attach profile to logged in user.
+	            // create social profile linked to current user
+	            $incomingProfile['user_id'] = $this->Auth->user('id');
+	            $this->User->SocialProfile->save($incomingProfile);
+	            $this->Session->setFlash('Your ' . $incomingProfile['provider'] . ' account has been linked.');
+	            $this->redirect($this->Auth->redirectUrl());
+
+	        } else {
+
+	            // no-one logged in, must be a registration.
+	            unset($incomingProfile['id']);
+	            $user = $this->User->register(array('User' => $incomingProfile), array('emailVerification'=>false));
+	            if (!$user) {
+	            	debug($this->User->validationErrors);
+	            	throw new CakeException(__d('users', 'Error registering users'));
+	            }
+	            // create social profile linked to new user
+	            $incomingProfile['user_id'] = $user['User']['id'];
+	            $incomingProfile['last_login'] = date('Y-m-d h:i:s');
+	            $incomingProfile['access_token'] = serialize($accessToken);
+	            $this->User->SocialProfile->save($incomingProfile);
+
+	            // log in
+	            $this->__doAuthLogin($user);
+	        }
+	    }
+	}
+
+	private function __doAuthLogin($user) {
+	    if ($this->Auth->login($user['User'])) {
+	        $user['last_login'] = date('Y-m-d H:i:s');
+	        $this->User->save(array('User' => $user));
+
+	        $this->Session->setFlash(sprintf(__d('users', '%s you have successfully logged in'), $this->Auth->user('username')));
+
+	        $Event = new CakeEvent(
+				'Users.Controller.Users.afterLogin',
+				$this,
+				array(
+					'data' => $this->request->data,
+					'isFirstLogin' => !$this->Auth->user('last_login')
+				)
+			);
+
+			$this->getEventManager()->dispatch($Event);
+			
+	        $this->redirect($this->Auth->redirectUrl());
+	    }
+	}
+
+
 
 }

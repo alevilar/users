@@ -25,19 +25,25 @@ class usersSchema extends CakeSchema {
 	public function after($event = array()) {
 	}
 
-	public $user_details = array(
+	public $social_profiles = array(
 		'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
-		'user_id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36),
-		'position' => array('type' => 'float', 'null' => false, 'default' => '1'),
-		'field' => array('type' => 'string', 'null' => false, 'default' => null, 'key' => 'index'),
-		'value' => array('type' => 'text', 'null' => true, 'default' => null),
-		'input' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 16),
-		'data_type' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 16),
-		'label' => array('type' => 'string', 'null' => false, 'length' => 128),
+		'user_id' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
+		'oid' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 136),
+		'email' => array('type' => 'string', 'null' => false, 'default' => null, 'key' => 'index'),
+		'family_name' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 128),
+		'given_name' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 128),
+		'gender' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 128),
+		'locale' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 128),
+		'birthday' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 128),
+		'picture' => array('type' => 'string', 'null' => false, 'length' => 128),
+		'provider' => array('type' => 'string', 'null' => false, 'length' => 128),
+		'raw' => array('type' => 'text', 'null' => true, 'default' => null),
 		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1),
-			'UNIQUE_PROFILE_PROPERTY' => array('column' => array('field', 'user_id'), 'unique' => 1)
+		'indexes' => array(
+			'PRIMARY' => array('column' => 'id', 'unique' => 1),
+			'BY_USERNAME' => array('column' => array('user_id'), 'unique' => 0),
+			'BY_OID' => array('column' => array('oid'), 'unique' => 0)
 		)
 	);
 

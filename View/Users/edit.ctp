@@ -16,7 +16,9 @@
 			<p>
 				<?php echo $this->Html->link(__d('users', 'Change your password'), array('action' => 'change_password')); ?>
 			</p>
+			<p>
+				<?php echo $this->Form->input('email') ?>
+			</p>
 		</fieldset>
 	<?php echo $this->Form->end(__d('users', 'Submit')); ?>
 </div>
-<?php echo $this->element('Users.Users/sidebar'); ?>

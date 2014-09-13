@@ -9,26 +9,37 @@
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 ?>
-<div class="users index">
-	<h2><?php echo __d('users', 'Login'); ?></h2>
-	<?php echo $this->Session->flash('auth');?>
-	<fieldset>
-		<?php
-			echo $this->Form->create($model, array(
-				'action' => 'login',
-				'id' => 'LoginForm'));
-			echo $this->Form->input('email', array(
-				'label' => __d('users', 'Email')));
-			echo $this->Form->input('password',  array(
-				'label' => __d('users', 'Password')));
-
-			echo '<p>' . $this->Form->input('remember_me', array('type' => 'checkbox', 'label' =>  __d('users', 'Remember Me'))) . '</p>';
-			echo '<p>' . $this->Html->link(__d('users', 'I forgot my password'), array('action' => 'reset_password')) . '</p>';
-
-			echo $this->Form->hidden('User.return_to', array(
-				'value' => $return_to));
-			echo $this->Form->end(__d('users', 'Submit'));
-		?>
-	</fieldset>
+<div class="col-md-8">
+	<h3>Bienvenidos al...</h3>
+	<h1>Ristorantino Mágico</h1>
 </div>
-<?php echo $this->element('Users.Users/sidebar'); ?>
+
+
+
+<div class="col-md-4 login">
+	<div class="row">
+
+		<div class="col-md-12">
+			<?php 
+			if ( !$this->Session->check('Auth.User')){
+				echo $this->element('Users.boxlogin');			
+		} else {		
+		 ?>
+			<h3>&nbsp;</h3>
+			<?php echo $this->Html->link(__('Add New Site'), array('plugin'=>'install', 'controller'=>'site_setup', 'action'=>'installsite'), array('class'=>'btn btn-success btn-lg center')); ?>
+
+			<h1>Mis Sitios</h1>
+			
+			<div class="list-group">
+				<?php App::uses('MtSites', 'MtSites.MtSites'); ?>
+				<?php if ( $this->Session->check('Auth.User.Site') ): ?>
+					<?php foreach ( $this->Session->read('Auth.User.Site') as $s ): ?>
+						<?php echo  $this->Html->link( $s['name'] , array( 'tenant' => $s['alias'], 'plugin'=>'risto' ,'controller' => 'pages', 'action' => 'display', 'dashboard' ), array('class'=>'list-group-item' ));?>
+					<?php endforeach; ?>
+				<?php endif; ?>
+
+			 </div>
+		<?php } ?>
+		</div>
+	</div>
+</div>
