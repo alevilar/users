@@ -1,5 +1,5 @@
 <?php
-App::uses('AppTenantModel', 'Users.Model');
+App::uses('AppTenantModel', 'Model');
 /**
  * Rol Model
  *
@@ -13,8 +13,6 @@ class Rol extends AppTenantModel {
  */
 	public $displayField = 'name';
         
-        
-    public $actsAs = array('Acl' => array('type' => 'requester'));
 
     
 /**
@@ -54,28 +52,17 @@ class Rol extends AppTenantModel {
 			'offset' => '',
 			'exclusive' => '',
 			'finderQuery' => '',
-			'counterQuery' => ''
+			'counterQuery' => '',
+			'with' => 'Users.RolesUser',
 		)
 	);
         
         public function beforeSave($options = array()) {
-            $this->data['Rol']['machin_name'] = strtolower( Inflector::slug( $this->data['Rol']['name'])) ;
+        	if (empty($this->data['Rol']['machin_name'])) {
+            	$this->data['Rol']['machin_name'] = strtolower( Inflector::slug( $this->data['Rol']['name'])) ;
+        	}
             return true;
         }
         
-        public function afterSave($created, $options = Array())
-        {
-            // colocar el nombre del rol como alias den Aro ACL
-            if ( $this->Aro->saveField('alias', $this->data['Rol']['machin_name']) ) { 
-                return parent::afterSave($created);
-            } else {
-                return false;
-            }
-        }
-        
-        public function parentNode(){
-            return;
-        }
-
 
 }

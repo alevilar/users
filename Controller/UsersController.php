@@ -255,14 +255,6 @@ class UsersController extends UsersAppController {
 		);
 	}
 
-/**
- * Simple listing of all users
- *
- * @return void
- */
-	public function index() {
-		$this->set('users', $this->Paginator->paginate($this->modelClass));
-	}
 
 /**
  * The homepage of a users giving him an overview about everything
@@ -299,7 +291,7 @@ class UsersController extends UsersAppController {
  *
  * @return void
  */
-	public function edit() {
+	public function my_edit() {
 		$user = $this->Auth->user();
 		if ( empty($user) ) {
 			throw new ForbiddenException(__("You must be logged in"));
@@ -322,7 +314,7 @@ class UsersController extends UsersAppController {
  *
  * @return void
  */
-	public function admin_index() {
+	public function index() {
 		if ($this->{$this->modelClass}->Behaviors->loaded('Searchable')) {
 			$this->Prg->commonProcess();
 			unset($this->{$this->modelClass}->validate['username']);
@@ -330,6 +322,9 @@ class UsersController extends UsersAppController {
 			$this->{$this->modelClass}->data[$this->modelClass] = $this->passedArgs;
 		}
 
+		$this->passedArgs[$this->modelClass]['site_alias'] = $this->Session->read('MtSites.current');
+
+		//debug($parsedConditions);
 		if ($this->{$this->modelClass}->Behaviors->loaded('Searchable')) {
 			$parsedConditions = $this->{$this->modelClass}->parseCriteria($this->passedArgs);
 		} else {
@@ -341,30 +336,18 @@ class UsersController extends UsersAppController {
 		$this->set('users', $this->Paginator->paginate());
 	}
 
-/**
- * Admin view
- *
- * @param string $id User ID
- * @return void
- */
-	public function admin_view($id = null) {
-		try {
-			$user = $this->{$this->modelClass}->view($id, 'id');
-		} catch (NotFoundException $e) {
-			$this->Session->setFlash(__d('users', 'Invalid User.'));
-			$this->redirect(array('action' => 'index'));
-		}
-
-		$this->set('user', $user);
-	}
 
 /**
  * Admin add
  *
  * @return void
  */
-	public function admin_add() {
-		if (!empty($this->request->data)) {
+	public function add() {
+		if ( $this->request->is('post') ) {
+			if (MtSites::isTenant() ) {
+                $site = $this->{$this->modelClass}->Site->findByAlias($this->Session->read('MtSites.current'));
+                $this->request->data['Site']['id'] = $site['Site']['id'];
+            }
 			$this->request->data[$this->modelClass]['tos'] = true;
 			$this->request->data[$this->modelClass]['email_verified'] = true;
 
@@ -373,8 +356,13 @@ class UsersController extends UsersAppController {
 				$this->redirect(array('action' => 'index'));
 			}
 		}
-		$this->set('roles', Configure::read('Users.roles'));
+		$roles = $this->{$this->modelClass}->Rol->find('list');
+		$this->set(compact( 'roles'));
+		$this->render('admin_form');
 	}
+
+
+
 
 /**
  * Admin edit
@@ -382,7 +370,7 @@ class UsersController extends UsersAppController {
  * @param null $userId
  * @return void
  */
-	public function admin_edit($userId = null) {
+	public function edit($userId = null) {
 		try {
 			$result = $this->{$this->modelClass}->edit($userId, $this->request->data);
 			if ($result === true) {
@@ -396,13 +384,48 @@ class UsersController extends UsersAppController {
 			$this->Session->setFlash($e->getMessage());
 			$this->redirect(array('action' => 'index'));
 		}
-
 		if (empty($this->request->data)) {
+			$this->{$this->modelClass}->recursive = 1;
 			$this->request->data = $this->{$this->modelClass}->read(null, $userId);
 			unset($this->request->data[$this->modelClass]['password']);
 		}
-		$this->set('roles', Configure::read('Users.roles'));
+
+		$roles = $this->{$this->modelClass}->Rol->find('list');
+		$this->set(compact( 'roles'));
+		$this->render('admin_form');
 	}
+
+
+/**
+ * Admin admin_edit_assign_other_site
+ *
+ * @param null $userId
+ * @return void
+ */
+	public function assign_other_site($userId = null) {
+
+		if ( $this->request->is('post') ) {
+			$sites = $this->request->data['Site'];
+			$this->request->data = $this->{$this->modelClass}->read(null, $userId);
+			$this->request->data['Site'] = $sites;
+			if ( $this->{$this->modelClass}->saveAll( $this->request->data) ) {
+				$this->Session->setFlash(__d('users', 'User saved'));
+				$this->redirect(array('action'=>'index'));
+			} else {
+				$this->Session->setFlash(__d('users', 'User Couldn´t be Saved'), 'Risto.flash_error');
+			}
+		}
+
+		 $this->{$this->modelClass}->recursive = 1;
+		$this->request->data = $this->{$this->modelClass}->read(null, $userId);
+		$currLogUser = $this->Auth->user();
+		$sites = $currLogUser['Site'];
+		$sites = Hash::combine($sites, '{n}.id', '{n}.name');
+		$this->set(compact( 'sites'));
+	}
+
+
+
 
 /**
  * Delete a user account
@@ -410,7 +433,7 @@ class UsersController extends UsersAppController {
  * @param string $userId User ID
  * @return void
  */
-	public function admin_delete($userId = null) {
+	public function delete($userId = null) {
 		if ($this->{$this->modelClass}->delete($userId)) {
 			$this->Session->setFlash(__d('users', 'User deleted'));
 		} else {
@@ -420,21 +443,14 @@ class UsersController extends UsersAppController {
 		$this->redirect(array('action' => 'index'));
 	}
 
-/**
- * Search for a user
- *
- * @return void
- */
-	public function admin_search() {
-		$this->search();
-	}
+
 
 /**
  * User register action
  *
  * @return void
  */
-	public function add() {
+	public function register() {
 		if ($this->Auth->user()) {
 			$this->Session->setFlash(__d('users', 'You are already registered and logged in!'));
 			$this->redirect('/');
@@ -541,50 +557,7 @@ class UsersController extends UsersAppController {
 		$this->set('allowRegistration', (is_null($allowRegistration) ? true : $allowRegistration));
 	}
 
-/**
- * Search - Requires the CakeDC Search plugin to work
- *
- * @throws MissingPluginException
- * @return void
- * @link https://github.com/CakeDC/search
- */
-	public function search() {
-		$this->_pluginLoaded('Search');
 
-		$searchTerm = '';
-		$this->Prg->commonProcess($this->modelClass);
-
-		$by = null;
-		if (!empty($this->request->params['named']['search'])) {
-			$searchTerm = $this->request->params['named']['search'];
-			$by = 'any';
-		}
-		if (!empty($this->request->params['named']['username'])) {
-			$searchTerm = $this->request->params['named']['username'];
-			$by = 'username';
-		}
-		if (!empty($this->request->params['named']['email'])) {
-			$searchTerm = $this->request->params['named']['email'];
-			$by = 'email';
-		}
-		$this->request->data[$this->modelClass]['search'] = $searchTerm;
-
-		$this->Paginator->settings = array(
-			'search',
-			'limit' => 12,
-			'by' => $by,
-			'search' => $searchTerm,
-			'conditions' => array(
-				'AND' => array(
-					$this->modelClass . '.active' => 1,
-					$this->modelClass . '.email_verified' => 1
-				)
-			)
-		);
-
-		$this->set('users', $this->Paginator->paginate($this->modelClass));
-		$this->set('searchTerm', $searchTerm);
-	}
 
 /**
  * Common logout action
@@ -940,8 +913,8 @@ class UsersController extends UsersAppController {
 
 	    } else {
 	        $this->Session->setFlash($result['message']);
-	        $this->redirect($this->Auth->redirectUrl());
 	    }
+        $this->redirect($this->Auth->redirectUrl());
 	}
 
 
@@ -1014,6 +987,7 @@ class UsersController extends UsersAppController {
 	}
 
 	private function __doAuthLogin($user) {
+		debug($user);
 	    if ($this->Auth->login($user['User'])) {
 	        $user['last_login'] = date('Y-m-d H:i:s');
 	        $this->User->save(array('User' => $user));

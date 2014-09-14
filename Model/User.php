@@ -48,7 +48,7 @@ class User extends UsersAppModel {
 	public $filterArgs = array(
 		'username' => array('type' => 'like'),
 		'email' => array('type' => 'value'),
-		'txt_buscar' => array(
+		'txt_search' => array(
             'type' => 'query',
             'method' => '__searchTextGeneric'
             ),
@@ -93,6 +93,20 @@ class User extends UsersAppModel {
 			'limit' => '',
 			'offset' => '',
 			'finderQuery' => '',
+		),
+		'Rol' => array(
+			'className' => 'Users.Rol',
+			'joinTable' => 'roles_users',
+			'foreignKey' => 'user_id',
+			'associationForeignKey' => 'rol_id',
+			'unique' => 'keepExisting',
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+			'with' => 'Users.RolesUser',
 		)
 	);
 
@@ -972,4 +986,37 @@ class User extends UsersAppModel {
 		}
 		return new CakeEmail('default');
 	}
+
+
+/**
+ * Returns an array $conditions for Search Plugin $filterArgs
+ *
+ * @return array
+ */
+	public function __searchTextGeneric ($data = array() ) {          
+            $condition = array(
+                'OR' => array(
+                    'lower(User.username) LIKE' => '%'. trim(strtolower( $data['txt_search'] )) .'%',
+                    'lower(User.email) LIKE'   => '%'. trim(strtolower( $data['txt_search'] )) .'%',
+            ));
+            return $condition;
+    }
+
+
+
+/**
+ * 
+ * Returns an array of User id for Searchg Plugin $filterArgs
+ *
+ * @return array
+ */
+    public function __searchFromSite ($data = array() ) {
+        $sites = $this->Site->find('all', array('conditions'=>array(
+                    'Site.alias' => $data['site_alias']
+                    ),
+        ));
+        $users = Hash::extract($sites, '{n}.User.{n}.id');
+        return $users;
+    }
+
 }

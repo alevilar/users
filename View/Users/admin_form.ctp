@@ -12,7 +12,13 @@
 <div class="users form">
 	<?php echo $this->Form->create($model); ?>
 		<fieldset>
-			<legend><?php echo __d('users', 'Edit User'); ?></legend>
+
+			<?php if ( empty( $this->request->data[$model]['id']) ): ?>
+				<legend><?php echo __d('users', 'Add User'); ?></legend>
+			<?php else: ?>
+				<legend><?php echo __d('users', 'Edit User'); ?></legend>
+			<?php endif; ?>
+
 			<?php
 				echo $this->Form->input('id');
 				echo $this->Form->input('username', array(
@@ -20,15 +26,22 @@
 				echo $this->Form->input('email', array(
 					'label' => __d('users', 'Email')));
 				if (!empty($roles)) {
-					echo $this->Form->input('role', array(
-						'label' => __d('users', 'Role'), 'values' => $roles));
+					echo $this->Form->input('Rol', array(
+						'label' => __d('users', 'Role')
+						));
 				}
-				echo $this->Form->input('is_admin', array(
-						'label' => __d('users', 'Is Admin')));
-					echo $this->Form->input('active', array(
+
+				if (!empty($sites)) {
+					echo $this->Form->input('Site', array(
+						'label' => __d('users', 'Site')
+						));
+				}
+			
+				echo $this->Form->input('active', array(
 						'label' => __d('users', 'Active')));
 			?>
 		</fieldset>
-	<?php echo $this->Form->end('Submit'); ?>
+	<?php echo $this->Form->button('Submit', array('class'=>'btn btn-success')); ?>		
+	<?php echo $this->Html->link(__('Cancel'), array('action'=>'index'), array('class'=>'btn btn-default') ); ?>
+	<?php echo $this->Form->end(); ?>
 </div>
-<?php echo $this->element('Users.Users/admin_sidebar'); ?>

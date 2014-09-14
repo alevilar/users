@@ -10,37 +10,83 @@
  */
 ?>
 <div class="users index">
+
+	<?php echo $this->Html->link(__('Add %s', __('User')), array('admin'=>true,'plugin'>'users', 'controller'=> 'users', 'action'=>'add'), array('class'=>'btn btn-success btn-lg pull-right')); ?>
 	<h2><?php echo __d('users', 'Users'); ?></h2>
 
-	<p><?php
-	echo $this->Paginator->counter(array(
-		'format' => __d('users', 'Page %page% of %pages%, showing %current% records out of %count% total, starting on record %start%, ending on %end%')
-	));
-	?></p>
-
-	<table cellpadding="0" cellspacing="0">
-	<tr>
-		<th><?php echo $this->Paginator->sort('username'); ?></th>
-		<th><?php echo $this->Paginator->sort('created'); ?></th>
-		<th class="actions"><?php echo __d('users', 'Actions'); ?></th>
-	</tr>
 	<?php
-	$i = 0;
-	foreach ($users as $user):
-		$class = null;
-		if ($i++ % 2 == 0) :
-			$class = ' class="altrow"';
-		endif;
-		?>
-		<tr<?php echo $class; ?>>
-			<td><?php echo $this->Html->link($user[$model]['username'], array('action' => 'view', $user[$model]['id'])); ?></td>
-			<td><?php echo $user[$model]['created']; ?></td>
-			<td class="actions">
-				<?php echo $this->Html->link(__d('users', 'View'), array('action' => 'view', $user[$model]['id'])); ?>
-			</td>
+		if (CakePlugin::loaded('Search')) {
+			echo $this->Form->create($model, array('action' => 'index'));
+				echo $this->Form->input('txt_search', array('label' => __d('users', 'Search')));
+			echo $this->Form->end(__d('users', 'Search'));
+		}
+	?>
+
+	<?php echo $this->element('Users.paging'); ?>
+	<?php echo $this->element('Users.pagination'); ?>
+	<table class="table">
+		<tr>
+			<th><?php echo $this->Paginator->sort('username'); ?></th>
+			<th><?php echo $this->Paginator->sort('email'); ?></th>
+			<th><?php echo $this->Paginator->sort('email_verified'); ?></th>
+			<th><?php echo $this->Paginator->sort('active'); ?></th>
+			<th><?php echo $this->Paginator->sort('created'); ?></th>
+			<th class="actions"><?php echo __d('users', 'Actions'); ?></th>
 		</tr>
-	<?php endforeach; ?>
+			<?php
+			$i = 0;
+			foreach ($users as $user):
+				$class = null;
+				if ($i++ % 2 == 0) :
+					$class = ' class="altrow"';
+				endif;
+			?>
+			<tr<?php echo $class;?>>
+				<td>
+					<?php echo $user[$model]['username']; ?>
+				</td>
+				<td>
+					<?php echo $user[$model]['email']; ?>
+				</td>
+				<td>
+					<?php echo $user[$model]['email_verified'] == 1 ? __d('users', 'Yes') : __d('users', 'No'); ?>
+				</td>
+				<td>
+					<?php echo $user[$model]['active'] == 1 ? __d('users', 'Yes') : __d('users', 'No'); ?>
+				</td>
+				<td>
+					<?php echo $user[$model]['created']; ?>
+				</td>
+				<td class="actions">
+
+					<div class="dropdown">
+						    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+						    <?php echo __('Options') ?>
+						    <span class="caret"></span>
+						  </button>
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+					    <li role="presentation">
+					    	<?php echo $this->Html->link(__d('users', 'Edit')
+					    				, array('action' => 'edit', $user[$model]['id'])
+					    				, array('role'=>'menuitem')
+					    				); ?>
+					    </li>
+					    <li role="presentation">
+					    	<?php echo $this->Html->link(__d('users', 'Assign Other Site'), array('action' => 'assign_other_site', $user[$model]['id'])); ?>
+					    </li>
+
+					    <li role="presentation" class="divider"></li>
+
+					    <li role="presentation">
+					    <?php echo $this->Html->link(__d('users', 'Delete'), array('action' => 'delete', $user[$model]['id']), null, sprintf(__d('users', 'Are you sure you want to delete # %s?'), $user[$model]['id'])); ?>
+					    </li>
+					  </ul>
+					</div>
+					
+					
+				</td>
+			</tr>
+		<?php endforeach; ?>
 	</table>
 	<?php echo $this->element('Users.pagination'); ?>
 </div>
-<?php echo $this->element('Users.Users/sidebar'); ?>
