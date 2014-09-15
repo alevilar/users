@@ -93,20 +93,6 @@ class User extends UsersAppModel {
 			'limit' => '',
 			'offset' => '',
 			'finderQuery' => '',
-		),
-		'Rol' => array(
-			'className' => 'Users.Rol',
-			'joinTable' => 'roles_users',
-			'foreignKey' => 'user_id',
-			'associationForeignKey' => 'rol_id',
-			'unique' => 'keepExisting',
-			'conditions' => '',
-			'fields' => '',
-			'order' => '',
-			'limit' => '',
-			'offset' => '',
-			'finderQuery' => '',
-			'with' => 'Users.RolesUser',
 		)
 	);
 

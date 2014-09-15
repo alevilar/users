@@ -53,7 +53,7 @@ class Rol extends AppTenantModel {
 			'exclusive' => '',
 			'finderQuery' => '',
 			'counterQuery' => '',
-			'with' => 'Users.RolesUser',
+			'with' => 'Users.RoleUser',
 		)
 	);
         
