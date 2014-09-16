@@ -909,6 +909,7 @@ class UsersController extends UsersAppController {
 	public function auth_callback($provider) {
 	    $result = $this->ExtAuth->loginCallback($provider);
 	    if ($result['success']) {
+	    	debug($result['profile']);
 	        $this->__successfulExtAuth($result['profile'], $result['accessToken']);
 
 	    } else {
