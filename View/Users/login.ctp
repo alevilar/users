@@ -10,8 +10,7 @@
  */
 ?>
 <div class="col-md-8">
-	<h3>Bienvenidos al...</h3>
-	<h1>Ristorantino Mágico</h1>
+	<h1>Dashboard</h1>
 </div>
 
 
