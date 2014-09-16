@@ -9,18 +9,9 @@
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 ?>
-<div class="col-md-8">
-	<?php if ( !$this->Session->check('Auth.User')){ ?>
-	<h3>Registrese para ingresar al sistema</h3>
-	<h1>¡Punto de Venta Web, y GRATUITO!</h1>
-	<?php } else { ?>
-	<h1>Dashboard</h1>
-	<?php } ?>
-</div>
 
 
-
-<div class="col-md-4 login">
+<div class="col-md-4 col-md-offset-4 login">
 	<div class="row">
 
 		<div class="col-md-12">

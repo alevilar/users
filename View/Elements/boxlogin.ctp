@@ -1,4 +1,4 @@
-<div class="user-login">
+<div class="user-login">	
 		<?php echo $this->element('Users.box_oauth_login'); ?>
 
 		<h1><?php echo __('Login') ?></h1>
