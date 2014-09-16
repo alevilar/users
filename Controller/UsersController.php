@@ -49,7 +49,7 @@ class UsersController extends UsersAppController {
  * @var array
  */
 	public $extra_components = array(        
-        'Security',
+   //     'Security',
 		'Users.RememberMe',
 	);
 
