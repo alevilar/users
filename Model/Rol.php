@@ -42,18 +42,18 @@ class Rol extends AppTenantModel {
  */
 	public $hasAndBelongsToMany = array(
 		'User' => array(
-			'className' => 'Users.User',
-			'foreignKey' => 'rol_id',
-			'dependent' => false,
+			'className' => 'Users.Rol',
+			'joinTable' => 'roles_users',
+			'foreignKey' => 'user_id',
+			'associationForeignKey' => 'rol_id',
+			'unique' => 'keepExisting',
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
 			'limit' => '',
 			'offset' => '',
-			'exclusive' => '',
 			'finderQuery' => '',
-			'counterQuery' => '',
-			'with' => 'Users.RoleUser',
+			'with' => 'Users.RolUser',
 		)
 	);
         

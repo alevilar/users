@@ -48,31 +48,7 @@ class UsersController extends UsersAppController {
  *
  * @var array
  */
-	public $components = array(		
-		'Session',
-        'Cookie',
-        'RequestHandler',
-        'MtSites.MtSites',
-        'Auth' => array(
-            'loginAction' => array('plugin'=>'users','controller' => 'users', 'action' => 'login'),
-            'logoutRedirect' => array('plugin'=>'users','controller' => 'users', 'action' => 'login'),
-            'loginError' => 'Usuario o Contraseña Incorrectos',
-            'authError' => 'Usted no tiene permisos para acceder a esta página.', 
-            'authorize' => array('MtSites.MtSites'),
-            'authenticate' => array(
-                'Form' => array(
-                    'recursive' => 1
-                )
-            ),        
-        ),
-        'ExtAuth.ExtAuth',
-        'Paginator',      
-        'Search.Prg' => array(
-            'presetForm' => array(
-                'paramType' => 'querystring'
-                )
-            ),
-        
+	public $extra_components = array(        
         'Security',
 		'Users.RememberMe',
 	);
@@ -115,6 +91,7 @@ class UsersController extends UsersAppController {
 		}
 	}
 
+
 /**
  * Returns $this->plugin with a dot, used for plugin loading using the dot notation
  *
@@ -153,6 +130,8 @@ class UsersController extends UsersAppController {
 		if ($this->_pluginLoaded('Search', false)) {
 			$this->components[] = 'Search.Prg';
 		}
+
+		$this->components = array_merge( $this->components, $this->extra_components);
 	}
 
 /**
@@ -167,6 +146,10 @@ class UsersController extends UsersAppController {
 
 		$this->set('model', $this->modelClass);
 		$this->_setDefaultEmail();
+
+		if ( MtSites::isTenant() ) {
+			$this->{$this->modelClass}->loadRole();
+		}
 	}
 
 /**
@@ -242,6 +225,7 @@ class UsersController extends UsersAppController {
 
 		$this->Auth->authenticate = array(
 			'Form' => array(
+				'contain' => array('Site'),
 				'recursive' => 1,
 				'fields' => array(
 					'username' => 'email',
@@ -344,9 +328,12 @@ class UsersController extends UsersAppController {
  */
 	public function add() {
 		if ( $this->request->is('post') ) {
-			if (MtSites::isTenant() ) {
+			if ( MtSites::isTenant() ) {
                 $site = $this->{$this->modelClass}->Site->findByAlias($this->Session->read('MtSites.current'));
                 $this->request->data['Site']['id'] = $site['Site']['id'];
+            } else {
+            	throw new ForbiddenException( __("Se debe ingresar un usuario para un Tenant válido"));
+            	
             }
 			$this->request->data[$this->modelClass]['tos'] = true;
 			$this->request->data[$this->modelClass]['email_verified'] = true;
@@ -354,8 +341,11 @@ class UsersController extends UsersAppController {
 			if ($this->{$this->modelClass}->add($this->request->data)) {
 				$this->Session->setFlash(__d('users', 'The User has been saved'));
 				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__d('users', 'The User couldn`t be saved'), 'Risto.flash_error');
 			}
 		}
+		$this->{$this->modelClass}->loadRole();
 		$roles = $this->{$this->modelClass}->Rol->find('list');
 		$this->set(compact( 'roles'));
 		$this->render('admin_form');
@@ -371,19 +361,16 @@ class UsersController extends UsersAppController {
  * @return void
  */
 	public function edit($userId = null) {
-		try {
-			$result = $this->{$this->modelClass}->edit($userId, $this->request->data);
-			if ($result === true) {
+
+		if ( $this->request->is('post')) {
+			if ( $this->{$this->modelClass}->save( $this->request->data ) ) {
 				$this->Session->setFlash(__d('users', 'User saved'));
 				$this->redirect(array('action' => 'index'));
 			} else {
-				unset($result[$this->modelClass]['password']);
-				$this->request->data = $result;
+				$this->Session->setFlash(__d('users', 'Error saving'), 'Risto.flash_error');
 			}
-		} catch (OutOfBoundsException $e) {
-			$this->Session->setFlash($e->getMessage());
-			$this->redirect(array('action' => 'index'));
 		}
+
 		if (empty($this->request->data)) {
 			$this->{$this->modelClass}->recursive = 1;
 			$this->request->data = $this->{$this->modelClass}->read(null, $userId);
@@ -501,8 +488,8 @@ class UsersController extends UsersAppController {
 		if ($Event->isStopped()) {
 			return;
 		}
-
 		if ($this->request->is('post')) {
+			
 			if ($this->Auth->login()) {
 				$Event = new CakeEvent(
 					'Users.Controller.Users.afterLogin',

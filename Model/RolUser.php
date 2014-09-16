@@ -5,7 +5,7 @@ App::uses('AppTenantModel', 'Model');
  *
  * @property User $User
  */
-class RoleUser extends AppTenantModel {
+class RolUser extends AppTenantModel {
 
 	public $useTable = 'roles_users';
        

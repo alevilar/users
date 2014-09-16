@@ -10,7 +10,7 @@
  */
 ?>
 <div class="users form">
-	<?php echo $this->Form->create($model); ?>
+	<?php echo $this->Form->create($model, array('type'=>'post')); ?>
 		<fieldset>
 
 			<?php if ( empty( $this->request->data[$model]['id']) ): ?>
@@ -39,6 +39,13 @@
 			
 				echo $this->Form->input('active', array(
 						'label' => __d('users', 'Active')));
+
+
+				if ( empty($this->request->data['$model']['tos']) ) {
+					$tosLink = $this->Html->link(__d('users', 'Terms of Service'), array('controller' => 'pages', 'action' => 'tos', 'plugin' => null));
+					echo $this->Form->input('tos', array(
+						'label' => __d('users', 'I have read and agreed to ') . $tosLink));
+				}
 			?>
 		</fieldset>
 	<?php echo $this->Form->button('Submit', array('class'=>'btn btn-success')); ?>		

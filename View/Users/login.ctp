@@ -10,7 +10,12 @@
  */
 ?>
 <div class="col-md-8">
+	<?php if ( !$this->Session->check('Auth.User')){ ?>
+	<h3>Registrese para ingresar al sistema</h3>
+	<h1>¡Punto de Venta Web, y GRATUITO!</h1>
+	<?php } else { ?>
 	<h1>Dashboard</h1>
+	<?php } ?>
 </div>
 
 
