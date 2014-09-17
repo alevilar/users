@@ -12,6 +12,9 @@
 <div class="users form">
 	<?php echo $this->Form->create($model, array('type'=>'post')); ?>
 		<fieldset>
+			<p>
+			Desde aquí puede asignar usuarios existentes en PaxaPOS, para ello debe ingresar el nombre de usuario y email válido. En caso de no existir esa combinación, se creará un nuevo usuario para que pueda utilizarlo en este sitio
+			</p>
 			<legend><?php echo __d('users', 'Assign Other Site to User %s', $this->request->data[$model]['username']); ?></legend>
 
 			<?php

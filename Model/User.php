@@ -53,7 +53,7 @@ class User extends UsersAppModel {
             'method' => '__searchTextGeneric'
             ),
         'site_alias' => array(
-            'type' => 'query',
+            'type' => 'expression',
             'method' => '__searchFromSite',
             'field' => 'User.id',
             ),
@@ -1030,7 +1030,7 @@ class User extends UsersAppModel {
  *
  * @return array
  */
-	public function __searchTextGeneric ($data = array() ) {          
+	public function __searchTextGeneric ($data = array() ) {
             $condition = array(
                 'OR' => array(
                     'lower(User.username) LIKE' => '%'. trim(strtolower( $data['txt_search'] )) .'%',

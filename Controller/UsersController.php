@@ -305,16 +305,15 @@ class UsersController extends UsersAppController {
 			unset($this->{$this->modelClass}->validate['email']);
 			$this->{$this->modelClass}->data[$this->modelClass] = $this->passedArgs;
 		}
+		if ( MtSites::isTenant() ){
+			$this->passedArgs['site_alias'] = MtSites::getSiteName();
+		}
 
-		$this->passedArgs[$this->modelClass]['site_alias'] = $this->Session->read('MtSites.current');
-
-		//debug($parsedConditions);
 		if ($this->{$this->modelClass}->Behaviors->loaded('Searchable')) {
 			$parsedConditions = $this->{$this->modelClass}->parseCriteria($this->passedArgs);
 		} else {
 			$parsedConditions = array();
 		}
-
 		$this->_setupAdminPagination();
 		$this->Paginator->settings[$this->modelClass]['conditions'] = $parsedConditions;
 		$this->set('users', $this->Paginator->paginate());
@@ -332,23 +331,43 @@ class UsersController extends UsersAppController {
                 $site = $this->{$this->modelClass}->Site->findByAlias($this->Session->read('MtSites.current'));
                 $this->request->data['Site']['id'] = $site['Site']['id'];
             } else {
-            	throw new ForbiddenException( __("Se debe ingresar un usuario para un Tenant válido"));
-            	
+            	throw new ForbiddenException( __("El Tenant (sitio: $site) no es válido o no fue encontrado en el sistema"));
             }
 			$this->request->data[$this->modelClass]['tos'] = true;
 			$this->request->data[$this->modelClass]['email_verified'] = true;
 
-			if ($this->{$this->modelClass}->add($this->request->data)) {
-				$this->Session->setFlash(__d('users', 'The User has been saved'));
-				$this->redirect(array('action' => 'index'));
+			$wasFound = $this->{$this->modelClass}->find('first', array(
+				'conditions' => array(
+						$this->modelClass.'.username' => $this->request->data[$this->modelClass]['username'],
+						$this->modelClass.'.email' => $this->request->data[$this->modelClass]['email']
+					)
+				));
+			if ( $wasFound ) {
+				// assign user to Site
+				if ( !empty( $this->request->data[$this->modelClass]['confirm_add_existing_user']) ) {
+					if ( $this->{$this->modelClass}->save($this->request->data) ) {
+						$this->Session->setFlash(__d('users', 'The User %s has been assigned to your site', $this->request->data[$this->modelClass]['username']));
+						$this->redirect(array('action' => 'index'));
+					} else {
+						$this->Session->setFlash(__d('users', 'The User couldn`t be saved'), 'Risto.flash_error');
+					}
+				} else {
+					$this->request->data[$this->modelClass]['is_existing_user'] = true;
+					$this->request->data = Hash::merge($this->request->data, $wasFound);
+				}
 			} else {
-				$this->Session->setFlash(__d('users', 'The User couldn`t be saved'), 'Risto.flash_error');
+				//save new user
+				if ($this->{$this->modelClass}->add($this->request->data)) {
+					$this->Session->setFlash(__d('users', 'The User has been saved'));
+					$this->redirect(array('action' => 'index'));
+				} else {
+					$this->Session->setFlash(__d('users', 'The User couldn`t be saved'), 'Risto.flash_error');
+				}
 			}
 		}
 		$this->{$this->modelClass}->loadRole();
 		$roles = $this->{$this->modelClass}->Rol->find('list');
 		$this->set(compact( 'roles'));
-		$this->render('admin_form');
 	}
 
 
@@ -396,6 +415,7 @@ class UsersController extends UsersAppController {
 			$this->request->data = $this->{$this->modelClass}->read(null, $userId);
 			$this->request->data['Site'] = $sites;
 			if ( $this->{$this->modelClass}->saveAll( $this->request->data) ) {
+				MtSites::loadSessionData();
 				$this->Session->setFlash(__d('users', 'User saved'));
 				$this->redirect(array('action'=>'index'));
 			} else {
@@ -403,7 +423,7 @@ class UsersController extends UsersAppController {
 			}
 		}
 
-		 $this->{$this->modelClass}->recursive = 1;
+		$this->{$this->modelClass}->recursive = 1;
 		$this->request->data = $this->{$this->modelClass}->read(null, $userId);
 		$currLogUser = $this->Auth->user();
 		$sites = $currLogUser['Site'];
