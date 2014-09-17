@@ -893,17 +893,7 @@ class UsersController extends UsersAppController {
 	public function auth_login($provider) {
 	    $result = $this->ExtAuth->login($provider);
 	    if ($result['success']) {
-	    	$Event = new CakeEvent(
-				'Users.Controller.Users.afterLogin',
-				$this,
-				array(
-					'data' => $this->request->data,
-					'isFirstLogin' => !$this->Auth->user('last_login')
-				)
-			);
-
-			$this->getEventManager()->dispatch($Event);
-
+	    	
 	    	$this->Auth->loginRedirect = $result['redirectURL'];
 	        $this->redirect( $this->Auth->redirectUrl() );
 
@@ -916,9 +906,7 @@ class UsersController extends UsersAppController {
 	public function auth_callback($provider) {
 	    $result = $this->ExtAuth->loginCallback($provider);
 	    if ($result['success']) {
-	    	debug($result['profile']);
 	        $this->__successfulExtAuth($result['profile'], $result['accessToken']);
-
 	    } else {
 	        $this->Session->setFlash($result['message']);
 	    }
@@ -945,7 +933,8 @@ class UsersController extends UsersAppController {
 	    } else {
 	    	// verificar que no se haya registrado con otra credencial
 	    	$existingUser = $this->User->find('first', array(
-		        'conditions' => array('email' => $incomingProfile['email'])
+		        'conditions' => array('email' => $incomingProfile['email']),
+		        'contain' => array('Site'),
 		    ));
 		    if ( $existingUser ) {
 		    	// User exists but never (logged using oauth) saved UserProfile => save UserProfile
@@ -995,23 +984,22 @@ class UsersController extends UsersAppController {
 	}
 
 	private function __doAuthLogin($user) {
-		debug($user);
 	    if ($this->Auth->login($user['User'])) {
 	        $user['last_login'] = date('Y-m-d H:i:s');
 	        $this->User->save(array('User' => $user));
-
-	        $this->Session->setFlash(sprintf(__d('users', '%s you have successfully logged in'), $this->Auth->user('username')));
 
 	        $Event = new CakeEvent(
 				'Users.Controller.Users.afterLogin',
 				$this,
 				array(
-					'data' => $this->request->data,
+					'data' => $user,
 					'isFirstLogin' => !$this->Auth->user('last_login')
 				)
 			);
 
 			$this->getEventManager()->dispatch($Event);
+
+	        $this->Session->setFlash(sprintf(__d('users', '%s you have successfully logged in'), $this->Auth->user('username')));
 			
 	        $this->redirect($this->Auth->redirectUrl());
 	    }
