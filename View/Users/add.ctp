@@ -26,15 +26,7 @@
 
 			<?php
 				echo $this->Form->input('id');
-				echo $this->Form->input('username', array(
-					'label' => __d('users', 'Username')));
-				echo $this->Form->input('email', array(
-					'label' => __d('users', 'Email')));
-				if (!empty($roles)) {
-					echo $this->Form->input('Rol', array(
-						'label' => __d('users', 'Role')
-						));
-				}
+				
 
 				if (!empty($sites)) {
 					echo $this->Form->input('Site', array(
@@ -54,11 +46,54 @@
 		</fieldset>
 
 		<?php if ( !empty($this->request->data[$model]['is_existing_user'])){ ?>
-			<?php echo $this->Form->button(__('Add Existing User'), array('class'=>'btn btn-warning')); ?>		
+
+			<?php
+				echo $this->Form->input('username_fake', array(
+					'label' => __d('users', 'Username'),
+					'disabled' => true,
+					'value' => $this->request->data[$model]['username'],
+					));
+				echo $this->Form->input('email_fake', array(
+					'label' => __d('users', 'Email'),
+					'disabled' => true,
+					'value' => $this->request->data[$model]['email'],
+					));
+
+				echo $this->Form->hidden('username');
+				echo $this->Form->hidden('email');
+				if (!empty($roles)) {
+					echo $this->Form->input('Rol', array(
+						'label' => __d('users', 'Role'),
+						));
+				}
+
+			?>
+
+
+			<?php echo $this->Form->button(__('Add Existing User into My Site'), array('class'=>'btn btn-danger')); ?>		
+			<?php echo $this->Html->link(__('Back and select other username & password'), array('action'=>'add'), array('class'=>'btn btn-default') ); ?>
 		<?php } else { ?>
-			<?php echo $this->Form->button(__('Create New User'), array('class'=>'btn btn-success')); ?>		
+
+			<?php
+
+				echo $this->Form->input('username', array(
+					'label' => __d('users', 'Username')
+					));
+				echo $this->Form->input('email', array(
+					'label' => __d('users', 'Email')));
+				if (!empty($roles)) {
+					echo $this->Form->input('Rol', array(
+						'label' => __d('users', 'Role')
+						));
+				}
+
+			?>
+
+
+			<?php echo $this->Form->button(__('Create New User'), array('class'=>'btn btn-success')); ?>	
+			<?php echo $this->Html->link(__('Cancel'), array('action'=>'index'), array('class'=>'btn btn-default') ); ?>	
 		<?php } ?>
 
-	<?php echo $this->Html->link(__('Cancel'), array('action'=>'index'), array('class'=>'btn btn-default') ); ?>
+	
 	<?php echo $this->Form->end(); ?>
 </div>

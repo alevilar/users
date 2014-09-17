@@ -320,13 +320,44 @@ class UsersController extends UsersAppController {
 	}
 
 
+
 /**
  * Admin add
  *
  * @return void
  */
-	public function add() {
+	public function delete_from_tenant ( $user_id ) {
 		if ( $this->request->is('post') ) {
+			$this->{$this->modelClass}->hasAndBelongsToMany['Site']['unique'] = true;
+			$user = $this->{$this->modelClass}->find('first', array(
+				'conditions' => array(
+					$this->modelClass.'.id' => $user_id
+					),
+				'contain' => array('Site'),
+				));
+			$alias = MtSites::getSiteName();
+			$newSites = Hash::remove( $user['Site'], "{n}[alias=$alias]" );
+			$user['Site'] = $newSites;
+			if ( $this->{$this->modelClass}->edit($user_id, $user) ) {
+				$this->Session->setFlash(__d('users','%s has ben dismissed from this site', $user[$this->modelClass]['username'] ));
+			} else {
+				$this->Session->setFlash(__d('users','Error saving user changes'), 'Risto.flash_error');
+			}
+		}
+
+		$this->redirect(array('action'=>'index'));
+	}
+
+
+
+/**
+ * Admin add
+ *
+ * @return void
+ */
+	public function add() {		
+		if ( $this->request->is('post') ) {	
+
 			if ( MtSites::isTenant() ) {
                 $site = $this->{$this->modelClass}->Site->findByAlias($this->Session->read('MtSites.current'));
                 $this->request->data['Site']['id'] = $site['Site']['id'];
@@ -345,6 +376,7 @@ class UsersController extends UsersAppController {
 			if ( $wasFound ) {
 				// assign user to Site
 				if ( !empty( $this->request->data[$this->modelClass]['confirm_add_existing_user']) ) {
+
 					if ( $this->{$this->modelClass}->save($this->request->data) ) {
 						$this->Session->setFlash(__d('users', 'The User %s has been assigned to your site', $this->request->data[$this->modelClass]['username']));
 						$this->redirect(array('action' => 'index'));
@@ -382,7 +414,8 @@ class UsersController extends UsersAppController {
 	public function edit($userId = null) {
 
 		if ( $this->request->is('post')) {
-			if ( $this->{$this->modelClass}->save( $this->request->data ) ) {
+			unset ( $this->request->data[$this->modelClass]['last_login'] );
+			if ( $this->{$this->modelClass}->edit($userId, $this->request->data) ) {
 				$this->Session->setFlash(__d('users', 'User saved'));
 				$this->redirect(array('action' => 'index'));
 			} else {

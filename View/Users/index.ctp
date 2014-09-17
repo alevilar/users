@@ -30,7 +30,7 @@
 			<th><?php echo $this->Paginator->sort('email'); ?></th>
 			<th><?php echo $this->Paginator->sort('email_verified'); ?></th>
 			<th><?php echo $this->Paginator->sort('active'); ?></th>
-			<th><?php echo $this->Paginator->sort('created'); ?></th>
+			<th><?php echo $this->Paginator->sort('last_login'); ?></th>
 			<th class="actions"><?php echo __d('users', 'Actions'); ?></th>
 		</tr>
 			<?php
@@ -55,7 +55,11 @@
 					<?php echo $user[$model]['active'] == 1 ? __d('users', 'Yes') : __d('users', 'No'); ?>
 				</td>
 				<td>
-					<?php echo $user[$model]['created']; ?>
+					<?php 
+					echo $user[$model]['last_login'] ?
+							$this->Time->timeAgoInWords( $user[$model]['last_login'])
+							: __d('users','never'); 
+					?>
 				</td>
 				<td class="actions">
 
@@ -78,7 +82,7 @@
 					    <li role="presentation" class="divider"></li>
 
 					    <li role="presentation">
-					    <?php echo $this->Html->link(__d('users', 'Delete'), array('action' => 'delete', $user[$model]['id']), null, sprintf(__d('users', 'Are you sure you want to delete # %s?'), $user[$model]['id'])); ?>
+					    	<?php echo $this->Form->postLink(__d('users', 'Dismiss from site'), array('action' => 'delete_from_tenant', $user[$model]['id']), null, sprintf(__d('users', 'Are you sure you want to delete from this site # %s?'), $user[$model]['id'])); ?>
 					    </li>
 					  </ul>
 					</div>
