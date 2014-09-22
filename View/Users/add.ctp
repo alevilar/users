@@ -15,8 +15,11 @@
 
 			<legend><?php echo __d('users', 'Add User'); ?></legend>
 
-			<p>
-				Si el Usuario no existe, es creado. Pero si se ingresa un nombre de usuario existente, junto a un email existente. Entonces podrá agregar ese usuario para que pueda operar en su Sitio.
+			<p class="alert alert-info text-info">
+				
+				Al crear un nuevo usuario desde aqui existen 2 opciones: 
+					<br>&nbsp;&nbsp;- <b>Que la combinación del nombre de usuario y contraseña existan previamente</b>. En ese caso se le da permisos al usuario existente para que pueda trabajar en su Sitio
+					<br>&nbsp;&nbsp;- <b>Que el nombre de usuario y contraseña NO existan</b>. En ese caso creará un usuario nuevo.
 			</p>
 
 
