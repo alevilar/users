@@ -11,10 +11,14 @@
 ?>
 <div class="users form">
 	<?php echo $this->Form->create($model); ?>
+	<?php echo $this->Form->input('id') ?>
 		<fieldset>
 			<legend><?php echo __d('users', 'Edit User'); ?></legend>
 			<p>
 				<?php echo $this->Html->link(__d('users', 'Change your password'), array('action' => 'change_password')); ?>
+			</p>
+			<p>
+				<?php echo $this->Form->input('username') ?>
 			</p>
 			<p>
 				<?php echo $this->Form->input('email') ?>

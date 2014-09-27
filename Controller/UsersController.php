@@ -280,17 +280,16 @@ class UsersController extends UsersAppController {
 		if ( empty($user) ) {
 			throw new ForbiddenException(__("You must be logged in"));
 		}
-        if ( $this->request->is('post') ) {
+        if ( $this->request->is('post') || $this->request->is('put') ) {
                 if ($this->User->save( $this->request->data) ) {
                         $this->Session->setFlash(__('Se ha guardado la información correctamente'));
-                        $this->User->recursive = 1;
-                        $user = $this->User->read(null, $id);
-                        $this->Session->write('Auth.User', $user);
+                        MtSites::loadSessionData();
                 } else {
                         $this->Session->setFlash(__('El usuario no pudo ser guardado. Por favor, intente nuevamente.'));
                 }
+        } else {
+        	$this->request->data['User'] = $user;
         }
-        $this->request->data = $user;
 	}
 
 /**

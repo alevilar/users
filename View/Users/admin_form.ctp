@@ -42,7 +42,8 @@
 
 
 				if ( empty($this->request->data['$model']['tos']) ) {
-					$tosLink = $this->Html->link(__d('users', 'Terms of Service'), array('controller' => 'pages', 'action' => 'tos', 'plugin' => null));
+					$tosLink = $this->Html->link(__d('users', 'Terms of Service')
+						, array('tenant'=>false,'controller' => 'pages', 'action' => 'tos', 'plugin' => null));
 					echo $this->Form->input('tos', array(
 						'label' => __d('users', 'I have read and agreed to ') . $tosLink));
 				}
