@@ -90,6 +90,13 @@
 						));
 				}
 
+				echo $this->Form->input('password', array(
+					'label' => __d('users', 'Password'),
+					'type' => 'password'));
+				echo $this->Form->input('temppassword', array(
+					'label' => __d('users', 'Password (confirm)'),
+					'type' => 'password'));
+
 			?>
 
 

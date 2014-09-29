@@ -472,7 +472,7 @@ class UsersController extends UsersAppController {
  * @param string $userId User ID
  * @return void
  */
-	public function delete($userId = null) {
+	public function delete($userId = null) {		
 		if ($this->{$this->modelClass}->delete($userId)) {
 			$this->Session->setFlash(__d('users', 'User deleted'));
 		} else {

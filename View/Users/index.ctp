@@ -76,7 +76,13 @@
 					    				); ?>
 					    </li>
 					    <li role="presentation">
-					    	<?php echo $this->Html->link(__d('users', 'Assign Other Site'), array('action' => 'assign_other_site', $user[$model]['id'])); ?>
+					    	<?php echo $this->Html->link(__d('users', 'Assign Other Site'), array('action' => 'delete', $user[$model]['id']), array(
+					    		'confirm' => __('Desea eliminar el usuario %s',  $user[$model]['username'])
+					    	) ); ?>
+					    </li>
+
+					    <li role="presentation">
+					    	<?php echo $this->Form->postLink(__d('users', 'Delete'), array('action' => 'delete', $user[$model]['id'])); ?>
 					    </li>
 
 					    <li role="presentation" class="divider"></li>
