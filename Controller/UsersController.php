@@ -405,10 +405,11 @@ class UsersController extends UsersAppController {
 				));
 			if ( $wasFound ) {
 				// assign user to Site
-				$user['User']['id'] = $wasFound['User']['id'];
+				//$user['User']['id'] = $wasFound['User']['id'];
 				$user['Site']['Site'][] = $site['Site']['id'];
 				$user['Rol'] = $this->request->data['Rol'];
-				if ( $this->{$this->modelClass}->save($user) ) {
+			
+				if ( $this->{$this->modelClass}->edit($user['User']['id'], $user) ) {
 					$this->Session->setFlash(__d('users', 'The User %s has been assigned to your site', $wasFound[$this->modelClass]['username']));
 					$this->redirect(array('action' => 'index'));
 					MtSites::loadSessionData();
