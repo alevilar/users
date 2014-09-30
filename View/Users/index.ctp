@@ -11,7 +11,11 @@
 ?>
 <div class="users index">
 
-	<?php echo $this->Html->link(__('Add %s', __('User')), array('admin'=>true,'plugin'>'users', 'controller'=> 'users', 'action'=>'add'), array('class'=>'btn btn-success btn-lg pull-right')); ?>
+	<div class="btn-group pull-right">
+	<?php echo $this->Html->link(__('Create New %s', __('User')), array('admin'=>true,'plugin'>'users', 'controller'=> 'users', 'action'=>'add'), array('class'=>'btn btn-success btn-lg')); ?>	
+	<?php echo $this->Html->link(__('Add Existing %s', __('User')), array('admin'=>true,'plugin'>'users', 'controller'=> 'users', 'action'=>'add_existing'), array('class'=>'btn btn-default btn-lg')); ?>
+	</div>
+
 	<h2><?php echo __d('users', 'Users'); ?></h2>
 
 	<?php

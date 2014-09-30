@@ -86,7 +86,7 @@ class User extends UsersAppModel {
 			'joinTable' => 'sites_users',
 			'foreignKey' => 'user_id',
 			'associationForeignKey' => 'site_id',
-			'unique' => 'keepExisting',
+			'unique' => false,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
