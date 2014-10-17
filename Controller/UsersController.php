@@ -469,6 +469,7 @@ class UsersController extends UsersAppController {
 		if ( $this->request->is('post') ) {
 			$sites = $this->request->data['Site'];
 			$this->request->data = $this->{$this->modelClass}->read(null, $userId);
+			$this->{$this->modelClass}->hasAndBelongsToMany['Site']['unique'] = true;
 			$this->request->data['Site'] = $sites;
 			if ( $this->{$this->modelClass}->save( $this->request->data) ) {
 				MtSites::loadSessionData();
