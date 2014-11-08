@@ -7,14 +7,18 @@
 
 		echo $this->Form->input('email',array('placeholder'=>'Email', 'label'=>false));
 		echo $this->Form->input('password', array('type'=>'password','placeholder'=>'Contraseña', 'label'=>false));
-		echo $this->Form->input('remember_me', array('type'=>'checkbox'));
+
+	
 
 		echo $this->Html->link('Olvidé la contraseña',
-			array('plugin'=>'users', 'controller'=>'users', 'action'=>'reset_password'),
-			array(
-				'style'=>'margin-bottom: 5px; display: block;',
-				'class'=>'small')
-			);
+		array('plugin'=>'users', 'controller'=>'users', 'action'=>'reset_password'),
+		array(
+			'style'=>'margin-bottom: 5px; display: block;',
+			'class'=>'small')
+		);
+		
+
+		
 		
 		echo $this->Form->button('Entrar', array('type'=>'submit', 'class'=>'btn btn-primary btn-block'));		
 
