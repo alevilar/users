@@ -33,7 +33,6 @@
 			<th><?php echo $this->Paginator->sort('username'); ?></th>
 			<th><?php echo $this->Paginator->sort('email'); ?></th>
 			<th><?php echo $this->Paginator->sort('Rol'); ?></th>
-			<th><?php echo $this->Paginator->sort('Site'); ?></th>
 			<th><?php echo $this->Paginator->sort('active'); ?></th>
 			<th><?php echo $this->Paginator->sort('last_login'); ?></th>
 			<th class="actions"><?php echo __d('users', 'Actions'); ?></th>
@@ -62,18 +61,6 @@
 							$roles .= ", " .$rol['name'];
 						} 
 						echo trim($roles, ',');
-					}
-					?>
-				</td>
-
-				<td>
-					<?php
-					$sites = '';
-					if (array_key_exists('Site', $user)) {
-						foreach ($user['Site'] as $site ) {
-							$sites .= ", " .$site['name'];
-						} 
-						echo trim($sites, ',');
 					}
 					?>
 				</td>
