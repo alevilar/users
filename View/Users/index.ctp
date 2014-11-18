@@ -32,7 +32,8 @@
 		<tr>
 			<th><?php echo $this->Paginator->sort('username'); ?></th>
 			<th><?php echo $this->Paginator->sort('email'); ?></th>
-			<th><?php echo $this->Paginator->sort('email_verified'); ?></th>
+			<th><?php echo $this->Paginator->sort('Rol'); ?></th>
+			<th><?php echo $this->Paginator->sort('Site'); ?></th>
 			<th><?php echo $this->Paginator->sort('active'); ?></th>
 			<th><?php echo $this->Paginator->sort('last_login'); ?></th>
 			<th class="actions"><?php echo __d('users', 'Actions'); ?></th>
@@ -50,11 +51,34 @@
 					<?php echo $user[$model]['username']; ?>
 				</td>
 				<td>
+					<spam class="email-verified"><?php echo $user[$model]['email_verified'] == 1 ? "✓" : "✕"; ?></spam>
 					<?php echo $user[$model]['email']; ?>
 				</td>
 				<td>
-					<?php echo $user[$model]['email_verified'] == 1 ? __d('users', 'Yes') : __d('users', 'No'); ?>
+					<?php
+					$roles = '';
+					if (array_key_exists('Rol', $user)) {
+						foreach ($user['Rol'] as $rol ) {
+							$roles .= ", " .$rol['name'];
+						} 
+						echo trim($roles, ',');
+					}
+					?>
 				</td>
+
+				<td>
+					<?php
+					$sites = '';
+					if (array_key_exists('Site', $user)) {
+						foreach ($user['Site'] as $site ) {
+							$sites .= ", " .$site['name'];
+						} 
+						echo trim($sites, ',');
+					}
+					?>
+				</td>
+
+
 				<td>
 					<?php echo $user[$model]['active'] == 1 ? __d('users', 'Yes') : __d('users', 'No'); ?>
 				</td>
@@ -84,7 +108,8 @@
 					    </li>
 
 					    <li role="presentation">
-					    	<?php echo $this->Form->postLink(__d('users', 'Delete'), array('action' => 'delete', $user[$model]['id'])); ?>
+					    	<?php echo $this->Form->postLink(__d('users', 'Delete'), array('action' => 'delete', $user[$model]['id']), null, sprintf(__d('users', 'Are you sure you want to delete The User # %s?'), $user[$model]['id'])); ?>
+
 					    </li>
 
 					    <li role="presentation" class="divider"></li>

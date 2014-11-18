@@ -146,10 +146,6 @@ class UsersController extends UsersAppController {
 
 		$this->set('model', $this->modelClass);
 		$this->_setDefaultEmail();
-
-		if ( MtSites::isTenant() ) {
-			$this->{$this->modelClass}->loadRole();
-		}
 	}
 
 /**
@@ -314,6 +310,12 @@ class UsersController extends UsersAppController {
 			$parsedConditions = array();
 		}
 		$this->_setupAdminPagination();
+
+		$this->Paginator->settings[$this->modelClass] = array(
+			'recursive' => 1,
+		);
+
+
 		$this->Paginator->settings[$this->modelClass]['conditions'] = $parsedConditions;
 		$this->set('users', $this->Paginator->paginate());
 	}
@@ -378,7 +380,7 @@ class UsersController extends UsersAppController {
 			}
 
 		}
-		$this->{$this->modelClass}->loadRole();
+
 		$roles = $this->{$this->modelClass}->Rol->find('list');
 		$this->set(compact( 'roles'));
 	}
@@ -404,12 +406,17 @@ class UsersController extends UsersAppController {
 					)
 				));
 			if ( $wasFound ) {
+
+
 				// assign user to Site
-				//$user['User']['id'] = $wasFound['User']['id'];
-				$user['Site']['Site'][] = $site['Site']['id'];
-				$user['Rol'] = $this->request->data['Rol'];
-			
-				if ( $this->{$this->modelClass}->edit($user['User']['id'], $user) ) {
+				debug( $this->request->data );
+				$user['Site']['id'] = $site['Site']['id'];
+				if (!empty($this->request->data['Rol']['Rol'][0])) {
+					$user['Rol']['id'] = $this->request->data['Rol']['Rol'][0];
+				}
+				$user['User']['id'] = $wasFound['User']['id'];
+				debug( $user );
+				if ( $this->{$this->modelClass}->edit($wasFound['User']['id'], $user) ) {
 					$this->Session->setFlash(__d('users', 'The User %s has been assigned to your site', $wasFound[$this->modelClass]['username']));
 					$this->redirect(array('action' => 'index'));
 					MtSites::loadSessionData();
@@ -421,7 +428,6 @@ class UsersController extends UsersAppController {
 				$this->Session->setFlash(__d('users', 'The User %s was not found', $this->request->data[$this->modelClass]['username']), 'Risto.flash_error');
 			}
 		}
-		$this->{$this->modelClass}->loadRole();
 		$roles = $this->{$this->modelClass}->Rol->find('list');
 		$this->set('site', $site);
 		$this->set(compact( 'roles'));

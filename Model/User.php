@@ -93,6 +93,20 @@ class User extends UsersAppModel {
 			'limit' => '',
 			'offset' => '',
 			'finderQuery' => '',
+		),
+		'Rol' => array(
+			'className' => 'Users.Rol',
+			'joinTable' => 'roles_users',
+			'foreignKey' => 'user_id',
+			'associationForeignKey' => 'rol_id',
+			'unique' => 'keepExisting',
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+			'with' => 'Users.RolUser',
 		)
 	);
 
@@ -225,39 +239,6 @@ class User extends UsersAppModel {
 		);
 	}
 
-
-/**
- * 
- *	Binds Rol Model when User is in Tenant
- *
- *
- */
-	public function loadRole () {
-		if ( MtSites::isTenant() ) {
-			$this->bindModel(
-			        array('hasAndBelongsToMany' => array(
-			                'Rol' => array(
-								'className' => 'Users.Rol',
-								'joinTable' => 'roles_users',
-								'foreignKey' => 'user_id',
-								'associationForeignKey' => 'rol_id',
-								'unique' => 'keepExisting',
-								'conditions' => '',
-								'fields' => '',
-								'order' => '',
-								'limit' => '',
-								'offset' => '',
-								'finderQuery' => '',
-								'with' => 'Users.RolUser',
-							)
-			            )
-			        )
-			    );
-		} else {
-			throw new CakeException("Es necesario estar en un tenant para bindear un Rol de Usuario");
-			
-		}
-	}
 
 /**
  * Create a hash from string using given method.
