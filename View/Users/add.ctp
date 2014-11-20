@@ -33,8 +33,6 @@
 				echo $this->Form->input('username', array(
 					'label' => __d('users', 'Username'),
 					 'required' => true,
-					 'pattern' => "[a-zA-Z0-9 _-]+",
-					 'oninvalid' => "setCustomValidity('Solo se permite: caracteres alfabñeticos, números, espacios y guiones. No ingresar otros símbolos')"
 					));
 				echo $this->Form->input('email', array(
 					'label' => __d('users', 'Email'),
