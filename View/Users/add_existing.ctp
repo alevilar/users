@@ -35,6 +35,8 @@
 			<?php echo $this->Form->button(__('Add Existing User into My Site'), array('class'=>'btn btn-danger')); ?>		
 			<?php echo $this->Html->link(__('Create New %s', __('User')), array('action'=>'add'), array('class'=>'btn btn-default') ); ?>
 
+			<?php echo $this->Html->link(__('Volver al Listado de Usuarios'), array('action'=>'index')); ?>
+
 	
 	<?php echo $this->Form->end(); ?>
 </div>

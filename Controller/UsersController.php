@@ -403,28 +403,50 @@ class UsersController extends UsersAppController {
 				'conditions' => array(
 						$this->modelClass.'.username' => $this->request->data[$this->modelClass]['username'],
 						$this->modelClass.'.email' => $this->request->data[$this->modelClass]['email']
-					)
+					),
+				'contain' => array(
+						'Site' => array(
+							'conditions' => array(
+								'Site.id' => $this->request->data['Site']['id'],
+								)
+							) 
+					),
 				));
-			if ( $wasFound ) {
+			
+			if ( !empty( $wasFound['Site']) ) {
+				$this->Session->setFlash(__d('users', 'The User %s is already in this site', $this->request->data[$this->modelClass]['username']), 'Risto.flash_warning');
+			} elseif ( $wasFound ) {
+				// assign user Rol & Site
+
+				$errorSavingRole = false; 
+				$errorSavingUserSite = false; 
 
 
-				// assign user to Site
-				debug( $this->request->data );
-				$user['Site']['id'] = $site['Site']['id'];
 				if (!empty($this->request->data['Rol']['Rol'][0])) {
-					$user['Rol']['id'] = $this->request->data['Rol']['Rol'][0];
-				}
-				$user['User']['id'] = $wasFound['User']['id'];
-				debug( $user );
-				if ( $this->{$this->modelClass}->edit($wasFound['User']['id'], $user) ) {
-					$this->Session->setFlash(__d('users', 'The User %s has been assigned to your site', $wasFound[$this->modelClass]['username']));
-					$this->redirect(array('action' => 'index'));
-					MtSites::loadSessionData();
-				} else {
-					$this->Session->setFlash(__d('users', 'The User couldn`t be saved'), 'Risto.flash_error');
+					$user['RolUser']['rol_id'] = $this->request->data['Rol']['Rol'][0];
+					$user['RolUser']['user_id'] = $wasFound['User']['id'];
+
+					$this->{$this->modelClass}->hasAndBelongsToMany['Rol']['unique'] = false;
+					if ( $this->{$this->modelClass}->RolUser->save($user ) ) {
+						$siteUser['SiteUser']['site_id'] = $this->request->data['Site']['id'];
+						$siteUser['SiteUser']['user_id'] = $wasFound['User']['id'];
+
+						if ( $this->{$this->modelClass}->SiteUser->save($siteUser) ) {
+							$this->Session->setFlash(__d('users', 'The User %s has been assigned to your site', $wasFound[$this->modelClass]['username']));
+							MtSites::loadSessionData();
+							$this->redirect(array('action' => 'index'));
+						} else {
+							$this->Session->setFlash(__d('users', 'Error saving Site to user to %s', $this->request->data[$this->modelClass]['username']), 'Risto.flash_error');
+						}
+
+					} else {
+						$errorSavingRole = true;
+						$this->Session->setFlash(__d('users', 'Error saving Role to %s', $this->request->data[$this->modelClass]['username']), 'Risto.flash_error');
+					}
 				}
 				
 			} else{
+				debug($wasFound);
 				$this->Session->setFlash(__d('users', 'The User %s was not found', $this->request->data[$this->modelClass]['username']), 'Risto.flash_error');
 			}
 		}
