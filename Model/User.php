@@ -1023,4 +1023,42 @@ class User extends UsersAppModel {
         return $users;
     }
 
+
+
+    public function addIntoSite( $site_id, $user_id = null ){
+    	if ( is_null( $user_id) ) {
+    		$user_id = $this->id;
+    	}
+
+    	$siteUser['SiteUser']['site_id'] = $site_id;
+		$siteUser['SiteUser']['user_id'] = $user_id;
+
+		return $this->SiteUser->save($siteUser);
+    }
+
+    public function addRoleIntoSite ( $rol_id, $user_id = null ) {
+    	if ( is_null( $user_id) ) {
+    		$user_id = $this->id;
+    	}
+
+    	$user['RolUser']['rol_id'] = $rol_id;
+		$user['RolUser']['user_id'] = $user_id;
+
+		$this->hasAndBelongsToMany['Rol']['unique'] = false;
+
+		return $this->RolUser->save( $user );
+    }
+
+    public function dismissUserFromSite ( $site_alias, $user_id = null) {
+    	if ( is_null( $user_id) ) {
+    		$user_id = $this->id;
+    	}
+    	$this->Site->recursive = -1;
+    	$site = $this->Site->findByAlias($site_alias);
+    	$siteUser['SiteUser.site_id'] = $site['Site']['id'];
+		$siteUser['SiteUser.user_id'] = $user_id;
+
+		return $this->SiteUser->deleteAll($siteUser);
+    }
+
 }

@@ -329,19 +329,9 @@ class UsersController extends UsersAppController {
  */
 	public function delete_from_tenant ( $user_id ) {
 		if ( $this->request->is('post') ) {
-			$this->{$this->modelClass}->hasAndBelongsToMany['Site']['unique'] = true;
-			$user = $this->{$this->modelClass}->find('first', array(
-				'conditions' => array(
-					$this->modelClass.'.id' => $user_id
-					),
-				'contain' => array('Site'),
-				));
-			$alias = MtSites::getSiteName();
-			$newSites = Hash::remove( $user['Site'], "{n}[alias=$alias]" );
-			$user['Site'] = $newSites;
-			$this->{$this->modelClass}->hasAndBelongsToMany['Site']['unique'] = 'keepExisting';
-			if ( $this->{$this->modelClass}->edit($user_id, $user) ) {
-				$this->Session->setFlash(__d('users','%s has ben dismissed from this site', $user[$this->modelClass]['username'] ));
+			$alias = MtSites::getSiteName();			
+			if ( $this->{$this->modelClass}->dismissUserFromSite($alias, $user_id) ) {
+				$this->Session->setFlash(__d('users','The user has ben dismissed from this site'));
 			} else {
 				$this->Session->setFlash(__d('users','Error saving user changes'), 'Risto.flash_error');
 			}
@@ -418,20 +408,16 @@ class UsersController extends UsersAppController {
 			} elseif ( $wasFound ) {
 				// assign user Rol & Site
 
-				$errorSavingRole = false; 
-				$errorSavingUserSite = false; 
-
+				$user_id = $wasFound['User']['id'];
 
 				if (!empty($this->request->data['Rol']['Rol'][0])) {
-					$user['RolUser']['rol_id'] = $this->request->data['Rol']['Rol'][0];
-					$user['RolUser']['user_id'] = $wasFound['User']['id'];
+					$rol_id = $this->request->data['Rol']['Rol'][0];
 
 					$this->{$this->modelClass}->hasAndBelongsToMany['Rol']['unique'] = false;
-					if ( $this->{$this->modelClass}->RolUser->save($user ) ) {
-						$siteUser['SiteUser']['site_id'] = $this->request->data['Site']['id'];
-						$siteUser['SiteUser']['user_id'] = $wasFound['User']['id'];
+					if ( $this->{$this->modelClass}->addRoleIntoSite($rol_id, $user_id) ) {
+						$site_id = $this->request->data['Site']['id'];
 
-						if ( $this->{$this->modelClass}->SiteUser->save($siteUser) ) {
+						if ( $this->{$this->modelClass}->addIntoSite($site_id, $user_id) ) {
 							$this->Session->setFlash(__d('users', 'The User %s has been assigned to your site', $wasFound[$this->modelClass]['username']));
 							MtSites::loadSessionData();
 							$this->redirect(array('action' => 'index'));
@@ -440,7 +426,6 @@ class UsersController extends UsersAppController {
 						}
 
 					} else {
-						$errorSavingRole = true;
 						$this->Session->setFlash(__d('users', 'Error saving Role to %s', $this->request->data[$this->modelClass]['username']), 'Risto.flash_error');
 					}
 				}
