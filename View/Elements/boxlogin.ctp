@@ -3,7 +3,7 @@
 
 		<h1><?php echo __('Login') ?></h1>
 		<?php
-		echo $this->Form->create('User', array('type'=>'post','url'=>array( 'plugin'=>'users','controller'=>'users','action'=>'login'), 'role'=>'form'));
+		echo $this->Form->create('User', array('type'=>'post','url'=> array( 'full_base' => true,'plugin'=>'users','controller'=>'users','action'=>'login'), 'role'=>'form'));
 
 		echo $this->Form->input('email',array('placeholder'=>'Email', 'label'=>false));
 		echo $this->Form->input('password', array('type'=>'password','placeholder'=>'Contraseña', 'label'=>false));
