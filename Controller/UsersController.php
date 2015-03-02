@@ -302,6 +302,9 @@ class UsersController extends UsersAppController {
 		}
 		if ( MtSites::isTenant() ){
 			$this->passedArgs['site_alias'] = MtSites::getSiteName();
+			$recursive = 1;
+		} else {
+			$recursive = 0;
 		}
 
 		if ($this->{$this->modelClass}->Behaviors->loaded('Searchable')) {
@@ -312,7 +315,7 @@ class UsersController extends UsersAppController {
 		$this->_setupAdminPagination();
 
 		$this->Paginator->settings[$this->modelClass] = array(
-			'recursive' => 1,
+			'recursive' => $recursive,
 		);
 
 
