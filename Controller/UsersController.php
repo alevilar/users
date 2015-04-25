@@ -1058,8 +1058,9 @@ class UsersController extends UsersAppController {
 
 	private function __doAuthLogin($user) {
 	    if ($this->Auth->login($user['User'])) {
-	        $user['last_login'] = date('Y-m-d H:i:s');
-	        $this->User->save(array('User' => $user));
+
+	        $this->{$this->modelClass}->id = $user['User']['id'];
+			$this->{$this->modelClass}->saveField('last_login', date('Y-m-d H:i:s'));
 
 	        $Event = new CakeEvent(
 				'Users.Controller.Users.afterLogin',
