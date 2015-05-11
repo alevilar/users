@@ -40,7 +40,7 @@ class UsersController extends UsersAppController {
  *
  * @var mixed
  */
-	public $plugin = null;
+	public $plugin = 'Users';
 
 
 /**
@@ -300,12 +300,8 @@ class UsersController extends UsersAppController {
 			unset($this->{$this->modelClass}->validate['email']);
 			$this->{$this->modelClass}->data[$this->modelClass] = $this->passedArgs;
 		}
-		if ( MtSites::isTenant() ){
-			$this->passedArgs['site_alias'] = MtSites::getSiteName();
-			$recursive = 1;
-		} else {
-			$recursive = 0;
-		}
+		
+		$recursive = 0;	
 
 		if ($this->{$this->modelClass}->Behaviors->loaded('Searchable')) {
 			$parsedConditions = $this->{$this->modelClass}->parseCriteria($this->passedArgs);
@@ -324,40 +320,6 @@ class UsersController extends UsersAppController {
 	}
 
 
-
-
-
-/**
- * Admin add
- *
- * @return void
- */
-	public function add() {		
-		if ( $this->request->is('post') ) {	
-
-			if ( MtSites::isTenant() ) {
-                $site = $this->{$this->modelClass}->Site->findByAlias($this->Session->read('MtSites.current'));
-                $this->request->data['Site']['id'] = $site['Site']['id'];
-            } else {
-            	throw new ForbiddenException( __("El Tenant (sitio: $site) no es válido o no fue encontrado en el sistema"));
-            }
-            
-			$this->request->data[$this->modelClass]['tos'] = true;
-			$this->request->data[$this->modelClass]['email_verified'] = true;
-
-			//save new user
-			if ($this->{$this->modelClass}->add($this->request->data)) {
-				$this->Session->setFlash(__d('users', 'The User has been saved'));
-				$this->redirect(array('action' => 'index'));
-			} else {
-				$this->Session->setFlash(__d('users', 'The User couldn`t be saved'), 'Risto.flash_error');
-			}
-
-		}
-
-		$roles = $this->{$this->modelClass}->Rol->find('list');
-		$this->set(compact( 'roles'));
-	}
 
 /**
  * Admin edit
