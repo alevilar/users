@@ -325,25 +325,6 @@ class UsersController extends UsersAppController {
 
 
 
-/**
- * Admin add
- *
- * @return void
- */
-	public function delete_from_tenant ( $user_id ) {
-		if ( $this->request->is('post') ) {
-			$alias = MtSites::getSiteName();			
-			if ( $this->{$this->modelClass}->dismissUserFromSite($alias, $user_id) ) {
-				$this->Session->setFlash(__d('users','The user has ben dismissed from this site'));
-			} else {
-				$this->Session->setFlash(__d('users','Error saving user changes'), 'Risto.flash_error');
-			}
-		}
-
-		$this->redirect(array('action'=>'index'));
-	}
-
-
 
 
 /**
@@ -379,72 +360,6 @@ class UsersController extends UsersAppController {
 	}
 
 /**
- * Admin add
- *
- * @return void
- */
-	public function add_existing() {		
-		if ( !MtSites::isTenant() ) {
-        	throw new ForbiddenException( __("El Tenant (sitio: $site) no es válido o no fue encontrado en el sistema"));
-        }
-        $site = $this->{$this->modelClass}->Site->findByAlias($this->Session->read('MtSites.current'));
-        $this->request->data['Site']['id'] = $site['Site']['id'];
-
-		if ( $this->request->is('post') ) {	
-
-			$wasFound = $this->{$this->modelClass}->find('first', array(
-				'conditions' => array(
-						$this->modelClass.'.username' => $this->request->data[$this->modelClass]['username'],
-						$this->modelClass.'.email' => $this->request->data[$this->modelClass]['email']
-					),
-				'contain' => array(
-						'Site' => array(
-							'conditions' => array(
-								'Site.id' => $this->request->data['Site']['id'],
-								)
-							) 
-					),
-				));
-			
-			if ( !empty( $wasFound['Site']) ) {
-				$this->Session->setFlash(__d('users', 'The User %s is already in this site', $this->request->data[$this->modelClass]['username']), 'Risto.flash_warning');
-			} elseif ( $wasFound ) {
-				// assign user Rol & Site
-
-				$user_id = $wasFound['User']['id'];
-
-				if (!empty($this->request->data['Rol']['Rol'][0])) {
-					$rol_id = $this->request->data['Rol']['Rol'][0];
-
-					$this->{$this->modelClass}->hasAndBelongsToMany['Rol']['unique'] = false;
-					if ( $this->{$this->modelClass}->addRoleIntoSite($rol_id, $user_id) ) {
-						$site_id = $this->request->data['Site']['id'];
-
-						if ( $this->{$this->modelClass}->addIntoSite($site_id, $user_id) ) {
-							$this->Session->setFlash(__d('users', 'The User %s has been assigned to your site', $wasFound[$this->modelClass]['username']));
-							MtSites::loadSessionData();
-							$this->redirect(array('action' => 'index'));
-						} else {
-							$this->Session->setFlash(__d('users', 'Error saving Site to user to %s', $this->request->data[$this->modelClass]['username']), 'Risto.flash_error');
-						}
-
-					} else {
-						$this->Session->setFlash(__d('users', 'Error saving Role to %s', $this->request->data[$this->modelClass]['username']), 'Risto.flash_error');
-					}
-				}
-				
-			} else{
-				debug($wasFound);
-				$this->Session->setFlash(__d('users', 'The User %s was not found', $this->request->data[$this->modelClass]['username']), 'Risto.flash_error');
-			}
-		}
-		$roles = $this->{$this->modelClass}->Rol->find('list');
-		$this->set('site', $site);
-		$this->set(compact( 'roles'));
-	}
-
-
-/**
  * Admin edit
  *
  * @param null $userId
@@ -471,37 +386,6 @@ class UsersController extends UsersAppController {
 		$roles = $this->{$this->modelClass}->Rol->find('list');
 		$this->set(compact( 'roles'));
 		$this->render('admin_form');
-	}
-
-
-/**
- * Admin admin_edit_assign_other_site
- *
- * @param null $userId
- * @return void
- */
-	public function assign_other_site($userId = null) {
-
-		if ( $this->request->is('post') ) {
-			$sites = $this->request->data['Site'];
-			$this->request->data = $this->{$this->modelClass}->read(null, $userId);
-			$this->{$this->modelClass}->hasAndBelongsToMany['Site']['unique'] = true;
-			$this->request->data['Site'] = $sites;
-			if ( $this->{$this->modelClass}->save( $this->request->data) ) {
-				MtSites::loadSessionData();
-				$this->Session->setFlash(__d('users', 'User saved'));
-				$this->redirect(array('action'=>'index'));
-			} else {
-				$this->Session->setFlash(__d('users', 'User Couldn´t be Saved'), 'Risto.flash_error');
-			}
-		}
-
-		$this->{$this->modelClass}->recursive = 1;
-		$this->request->data = $this->{$this->modelClass}->read(null, $userId);
-		$currLogUser = $this->Auth->user();
-		$sites = $currLogUser['Site'];
-		$sites = Hash::combine($sites, '{n}.id', '{n}.name');
-		$this->set(compact( 'sites'));
 	}
 
 
