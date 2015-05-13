@@ -90,9 +90,7 @@
 					    				, array('role'=>'menuitem')
 					    				); ?>
 					    </li>
-					    <li role="presentation">
-					    <?php echo $this->Html->link(__d('users', 'Assign Other Site'), array('action' => 'assign_other_site', $user[$model]['id'])); ?>
-					    </li>
+					    
 
 					    <li role="presentation">
 					    	<?php echo $this->Form->postLink(__d('users', 'Delete'), array('action' => 'delete', $user[$model]['id']), null, sprintf(__d('users', 'Are you sure you want to delete The User # %s?'), $user[$model]['id'])); ?>
@@ -101,9 +99,6 @@
 
 					    <li role="presentation" class="divider"></li>
 
-					    <li role="presentation">
-					    	<?php echo $this->Form->postLink(__d('users', 'Dismiss from site'), array('action' => 'delete_from_tenant', $user[$model]['id']), null, sprintf(__d('users', 'Are you sure you want to delete from this site # %s?'), $user[$model]['id'])); ?>
-					    </li>
 					  </ul>
 					</div>
 					
