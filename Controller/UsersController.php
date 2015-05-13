@@ -128,7 +128,8 @@ class UsersController extends UsersAppController {
  */
 	protected function _setupComponents() {
 		if ($this->_pluginLoaded('Search', false)) {
-			$this->components[] = 'Search.Prg';
+			// no quiero que me lo cargue este plugin ya lo tengo cargado de mi App
+			//$this->components[] = 'Search.Prg';
 		}
 
 		$this->components = array_merge( $this->components, $this->extra_components);
