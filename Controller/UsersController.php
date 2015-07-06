@@ -812,11 +812,9 @@ class UsersController extends UsersAppController {
 
 	public function auth_login($provider) {
 	    $result = $this->ExtAuth->login($provider);
-	    if ($result['success']) {
-	    	
-	    	$this->Auth->loginRedirect = $result['redirectURL'];
-	        $this->redirect( $this->Auth->redirectUrl() );
-
+	    if ($result['success']) {			    
+	    	$this->Auth->loginRedirect = $result['redirectURL'];	    	
+	        $this->redirect( $this->Auth->loginRedirect );
 	    } else {
 	        $this->Session->setFlash($result['message']);
 	        $this->redirect($this->Auth->redirectUrl());
@@ -825,12 +823,13 @@ class UsersController extends UsersAppController {
 
 	public function auth_callback($provider) {
 	    $result = $this->ExtAuth->loginCallback($provider);
+
 	    if ($result['success']) {
 	        $this->__successfulExtAuth($result['profile'], $result['accessToken']);
 	    } else {
 	        $this->Session->setFlash($result['message']);
 	    }
-        $this->redirect($this->Auth->redirectUrl());
+        $this->redirect($this->Auth->redirectUrl() );
 	}
 
 
@@ -866,7 +865,6 @@ class UsersController extends UsersAppController {
 
 	            // log in
 	            $this->__doAuthLogin($existingUser);
-
 	            $this->redirect($this->Auth->redirectUrl());
 		    }
 
@@ -887,8 +885,7 @@ class UsersController extends UsersAppController {
 	            // no-one logged in, must be a registration.
 	            unset($incomingProfile['id']);
 	            $user = $this->User->register(array('User' => $incomingProfile), array('emailVerification'=>false));
-	            if (!$user) {
-	            	debug($this->User->validationErrors);
+	            if (!$user) {	            	
 	            	throw new CakeException(__d('users', 'Error registering users'));
 	            }
 	            // create social profile linked to new user
@@ -921,8 +918,12 @@ class UsersController extends UsersAppController {
 			$this->getEventManager()->dispatch($Event);
 
 	        $this->Session->setFlash(sprintf(__d('users', '%s you have successfully logged in'), $this->Auth->user('username')));
-			
-	        $this->redirect($this->Auth->redirectUrl());
+
+			$redUrl = $this->Auth->redirectUrl();
+			if ( $this->Auth->redirectUrl() != '/') {
+				$redUrl = $this->Auth->redirectUrl() ."/";
+			}
+	        $this->redirect( $redUrl );
 	    }
 	}
 
