@@ -49,7 +49,7 @@
 				<h2><?php echo __d('users', 'Regístrate'); ?></h2>
 				<fieldset>
 					<?php
-						echo $this->Form->create($model);
+						echo $this->Form->create($model, array('url'=>array('plugin'=>'users','controller'=>'users', 'action'=>'register')));
 						echo $this->Form->input('username', array(
 							'label' => __d('users', 'Username')));
 						echo $this->Form->input('email', array(
