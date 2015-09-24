@@ -14,7 +14,7 @@ App::uses('UsersAppModel', 'Users.Model');
 App::uses('SearchableBehavior', 'Search.Model/Behavior');
 App::uses('SluggableBehavior', 'Utils.Model/Behavior');
 App::uses('MtSites', 'MtSites.Utility');
-
+App::uses('CakeText', 'Utility');
 /**
  * Users Plugin User Model
  *
@@ -634,7 +634,7 @@ class User extends UsersAppModel {
 		if ($this->validates()) {
 			if ( empty( $postData[$this->alias]['password'] )) {
 				// Oauth registering
-				$postData[$this->alias]['password'] = String::uuid();
+				$postData[$this->alias]['password'] = CakeText::uuid();
 			}
 			$postData[$this->alias]['password'] = $this->hash($postData[$this->alias]['password'], 'sha1', true);
 			$this->create();
