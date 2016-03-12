@@ -133,6 +133,14 @@ class User extends UsersAppModel {
 	public $validationDomain = 'users';
 
 /**
+ * Enable / Disable callbacks parameter.
+ * Can be use when subclassing to ensure callbacks run.
+ *
+ * @var boolean
+ */
+	public $enableCallbacks = false;
+
+/**
  * Validation parameters
  *
  * @var array
@@ -140,8 +148,9 @@ class User extends UsersAppModel {
 	public $validate = array(
 		'username' => array(
 			'required' => array(
-				'rule' => array('notBlank'),
-				'required' => true, 'allowEmpty' => false,
+				'rule' => array('custom', '/.+/'),
+				'required' => true,
+				'allowEmpty' => false,
 				'message' => 'Please enter a username.'
 			),
 			
@@ -292,7 +301,7 @@ class User extends UsersAppModel {
  * @param string $token
  * @return array
  */
-	public function checkEmailVerfificationToken($token = null) {
+	public function checkEmailVerificationToken($token = null) {
 		$result = $this->find('first', array(
 			'contain' => array(),
 			'conditions' => array(
@@ -318,7 +327,7 @@ class User extends UsersAppModel {
  * @return array On success it returns the user data record
  */
 	public function verifyEmail($token = null) {
-		$user = $this->checkEmailVerfificationToken($token);
+		$user = $this->checkEmailVerificationToken($token);
 
 		if ($user === false) {
 			throw new RuntimeException(__d('users', 'Invalid token, please check the email you were sent, and retry the verification link.'));
@@ -336,7 +345,7 @@ class User extends UsersAppModel {
 
 		$user = $this->save($user, array(
 			'validate' => false,
-			'callbacks' => false
+			'callbacks' => $this->enableCallbacks
 		));
 		$this->data = $user;
 		return $user;
@@ -443,7 +452,7 @@ class User extends UsersAppModel {
 			$this->data[$this->alias]['password_token'] = null;
 			$result = $this->save($this->data, array(
 				'validate' => false,
-				'callbacks' => false)
+				'callbacks' => $this->enableCallbacks)
 			);
 		}
 
@@ -465,7 +474,7 @@ class User extends UsersAppModel {
 			$this->data[$this->alias]['password'] = $this->hash($this->data[$this->alias]['new_password'], null, true);
 			$this->save($postData, array(
 				'validate' => false,
-				'callbacks' => false));
+				'callbacks' => $this->enableCallbacks));
 			return true;
 		}
 		return false;
@@ -579,7 +588,7 @@ class User extends UsersAppModel {
 				$user[$this->alias]['email_token_expires'] = $this->emailTokenExpirationTime();
 				$this->save($user, array(
 					'validate' => false,
-					'callbacks' => false,
+					'callbacks' => $this->enableCallbacks,
 				));
 			}
 			$this->data = $user;
@@ -921,8 +930,8 @@ class User extends UsersAppModel {
 		if (!empty($postData)) {
 			$this->set($postData);
 			if ($this->validates()) {
-				if (!empty($this->data[$this->alias]['password'])) {
-					$this->data[$this->alias]['password'] = $this->hash($this->data[$this->alias]['password'], 'sha1', true);
+				if(isset($postData[$this->alias]['password'])) {
+					$this->data[$this->alias]['password'] = $this->hash($postData[$this->alias]['password'], 'sha1', true);
 				}
 				$result = $this->save(null, false);
 				if ($result) {

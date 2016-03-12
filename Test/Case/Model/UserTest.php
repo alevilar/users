@@ -257,6 +257,28 @@ class UserTestCase extends CakeTestCase {
 			'password'));
 
 		$postData = array('User' => array(
+			'username' => ' 			  ',
+			'email' => 'test@test.com',
+			'password' => '123456',
+			'temppassword' => '123456',
+			'tos' => 1));
+		$result = $this->User->register($postData);
+		$this->assertFalse($result);
+		$this->assertEquals(array_keys($this->User->invalidFields()), array(
+			'username'));
+
+		$postData = array('User' => array(
+			'username' => ' ',
+			'email' => 'test@test.com',
+			'password' => '123456',
+			'temppassword' => '123456',
+			'tos' => 1));
+		$result = $this->User->register($postData);
+		$this->assertFalse($result);
+		$this->assertEquals(array_keys($this->User->invalidFields()), array(
+			'username'));
+
+		$postData = array('User' => array(
 			'username' => 'imanewuser',
 			'email' => 'foo@bar.com',
 			'password' => 'password',
@@ -428,14 +450,21 @@ class UserTestCase extends CakeTestCase {
  **/
 	public function testEditPassword() {
 		$userId = '1';
-		$data = $this->User->read(null, $userId);
-		$data['User']['email'] = 'anotherNewEmail@anothernewemail.com';
-		$data['User']['password'] = 'anotherNewPassword';
-		$data['User']['temppassword'] = 'anotherNewPassword';
 
-		$result = $this->User->edit(1, $data);
+		$data1 = $this->User->read(null, $userId);
 
-		$hashPassword = $this->User->hash($data['User']['password'], 'sha1', true);
+		$data['User']['email'] = 'emailUpdate@anotheremail.com';
+		$result = $this->User->edit($userId, $data);
+		$this->assertTrue($result);
+		$this->assertEquals($this->User->data['User']['password'], $data1['User']['password']);
+
+		$data1['User']['email'] = 'anotherNewEmail@anothernewemail.com';
+		$data1['User']['password'] = 'anotherNewPassword';
+		$data1['User']['temppassword'] = 'anotherNewPassword';
+
+		$result = $this->User->edit($userId, $data1);
+
+		$hashPassword = $this->User->hash($data1['User']['password'], 'sha1', true);
 		$this->assertTrue($result);
 		$this->assertEquals($this->User->data['User']['password'], $hashPassword);
 
