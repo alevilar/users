@@ -834,11 +834,13 @@ class UsersController extends UsersAppController {
 
 
 	private function __successfulExtAuth($incomingProfile, $accessToken) {
-
 	    // search for profile
 	    $this->User->SocialProfile->recursive = -1;
+	    $oid = !empty($incomingProfile['oid']) ? $incomingProfile['oid'] : '';
+	    $oid = !empty($incomingProfile['id']) ? $incomingProfile['id'] : $oid;
+
 	    $existingProfile = $this->User->SocialProfile->find('first', array(
-	        'conditions' => array('oid' => $incomingProfile['oid'])
+	        'conditions' => array('oid' => $oid)
 	    ));
 
 	    if ($existingProfile) {
@@ -858,6 +860,7 @@ class UsersController extends UsersAppController {
 		    if ( $existingUser ) {
 		    	// User exists but never (logged using oauth) saved UserProfile => save UserProfile
 	            $incomingProfile['user_id'] = $existingUser['User']['id'];
+	            $incomingProfile['oid'] = $oid;
 	            $incomingProfile['last_login'] = date('Y-m-d h:i:s');
 	            $incomingProfile['access_token'] = serialize($accessToken);
 	            $this->User->SocialProfile->save($incomingProfile);
