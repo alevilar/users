@@ -20,7 +20,7 @@
 
 	<?php
 		if (CakePlugin::loaded('Search')) {
-			echo $this->Form->create($model, array('action' => 'index'));
+			echo $this->Form->create($model, array( 'url' => array('action' => 'index') ));
 				echo $this->Form->input('txt_search', array('label' => __d('users', 'Search')));
 			echo $this->Form->end(__d('users', 'Search'));
 		}
