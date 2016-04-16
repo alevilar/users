@@ -797,7 +797,21 @@ class UsersController extends UsersAppController {
  * @link http://book.cakephp.org/2.0/en/core-libraries/components/authentication.html#using-controllerauthorize
  */
 	public function isAuthorized($user = null) {
-		return parent::isAuthorized($user);
+		$ret = parent::isAuthorized($user);
+		if ( $this->action == 'index') {
+
+		    if( !array_key_exists('is_admin', $user) ){
+		           $ret =  false;
+		    }
+
+
+		    //si es admin general esta autorizado
+		    if( empty($user['is_admin']) ) {		
+		            $ret =  false;
+		    }
+		}
+
+		return $ret;
 	}
 
 
