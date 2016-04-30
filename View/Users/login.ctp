@@ -10,14 +10,31 @@
  */
 ?>
 
+<div class="row">
+	<div class="col-sm-12 center">
+		
+		<h2><?php echo __('Ingresá o Registrate Usando Facebook o Google') ?></h2>
+		<?php
+		// box Login OAUTH
+		echo $this->element('Users.box_oauth_login'); 
+		?>
+
+		<h1><?php echo __('O') ?></h1>
+	</div>
+</div>
+
 
 <div class="row">
-	<div class="login text-center col-md-6 col-sm-12">	
+		
 
+
+	<div class="login text-center col-md-6 col-sm-12">	
+	
 
 		<div class="row">
 
 			<div class="col-md-10 col-md-offset-1">
+			<h3 class="blue">Ingresar con cuenta PaxaPos</h3>
 				<?php 
 				if ( !$this->Session->check('Auth.User')){
 					echo $this->element('Users.boxlogin');			
@@ -44,9 +61,10 @@
 
 	<div class="user-login text-center col-md-6 col-sm-12">	
 		<div class="row">
-			<div class="col-md-10 col-md-offset-1" style="background: #b71d21; color: white;">
+
+			<div class="col-md-10 col-md-offset-1 bg-red white">
 				<div class="users form">
-				<h2><?php echo __d('users', 'Regístrate'); ?></h2>
+				<h3><?php echo __d('users', 'Abrir nueva cuenta PaxaPos'); ?></h3>
 				<fieldset>
 					<?php
 						echo $this->Form->create($model, array('url'=>array('plugin'=>'users','controller'=>'users', 'action'=>'register')));
