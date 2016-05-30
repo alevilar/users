@@ -399,7 +399,7 @@ class UsersController extends UsersAppController {
 				}
 
 				$this->_sendVerificationEmail($this->{$this->modelClass}->data);
-				$this->Session->setFlash(__d('users', 'Your account has been created. You should receive an e-mail shortly to authenticate your account. Once validated you will be able to login.'));
+				$this->Session->setFlash(__d('users', 'Your account has been created. You should receive an e-mail shortly to authenticate your account. Once validated you will be able to login.', array('class' => 'message big')));
 				$this->redirect(array('action' => 'login'));
 			} else {
 				unset($this->request->data[$this->modelClass]['password']);

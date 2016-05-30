@@ -9,7 +9,7 @@
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 ?>
-<div class="users form">
+<div class="users form col-sm-4 col-sm-offset-4">
 	<?php echo $this->Form->create($model); ?>
 	<?php echo $this->Form->input('id') ?>
 		<fieldset>
