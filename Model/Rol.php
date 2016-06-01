@@ -29,7 +29,7 @@ class Rol extends AppModel {
 
 		// usar el correspondiente al tenant
 		//debug( Router::$_requests );
-		if ( CakeSession::started() ) {
+		if ( MtSites::isTenant() ) {
 			$currentTenant = MtSites::getSiteName();
 			if ( $currentTenant ) {
 				
@@ -81,6 +81,15 @@ class Rol extends AppModel {
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
+
+	/**
+ * hasMany associations
+ *
+ * @var array
+ */
+	public $hasOne = array('Users.GenericUser');
+
+
 /**
  * hasMany associations
  *
@@ -100,7 +109,7 @@ class Rol extends AppModel {
 			'offset' => '',
 			'finderQuery' => '',
 			'with' => 'Users.RolUser',
-		)
+		),
 	);
         
         public function beforeSave($options = array()) {

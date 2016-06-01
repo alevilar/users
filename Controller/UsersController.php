@@ -210,7 +210,7 @@ class UsersController extends UsersAppController {
 			return;
 		}
 
-		$this->Auth->allow('add', 'reset', 'verify', 'logout', 'view', 'reset_password', 'login', 'resend_verification', 'auth_login', 'auth_callback');
+		$this->Auth->allow('add', 'reset', 'verify', 'logout', 'view', 'reset_password', 'login', 'resend_verification', 'auth_login', 'auth_callback', 'tenant_login');
 
 		if (!is_null(Configure::read('Users.allowRegistration')) && !Configure::read('Users.allowRegistration')) {
 			$this->Auth->deny('add');
@@ -219,7 +219,7 @@ class UsersController extends UsersAppController {
 		if ($this->request->action == 'register') {
 			$this->Components->disable('Auth');
 		}
-
+/*
 		$this->Auth->authenticate = array(
 			'Form' => array(
 				'contain' => array('Site'),
@@ -230,10 +230,11 @@ class UsersController extends UsersAppController {
 				'userModel' => $this->_pluginDot() . $this->modelClass,
 				'scope' => array(
 					$this->modelClass . '.active' => 1,
-					$this->modelClass . '.email_verified' => 1
+					// $this->modelClass . '.email_verified' => 1
 				)
 			)
 		);
+		*/
 	}
 
 
@@ -409,6 +410,18 @@ class UsersController extends UsersAppController {
 		}
 	}
 
+
+
+	public function tenant_login() {
+		if ($this->request->is('post')) {
+			$this->request->data['GenericUser']['pin']  = $this->request->data['GenericUser']['k1'] 
+														. $this->request->data['GenericUser']['k2']
+														. $this->request->data['GenericUser']['k3']
+														. $this->request->data['GenericUser']['k4'];
+		}
+		$this->login();
+	}
+
 /**
  * Common login action
  *
@@ -443,13 +456,15 @@ class UsersController extends UsersAppController {
 				$this->getEventManager()->dispatch($Event);
 
 				$this->{$this->modelClass}->id = $this->Auth->user('id');
-				$this->{$this->modelClass}->saveField('last_login', date('Y-m-d H:i:s'));
+				if ($this->User->exists()) {
+					$this->{$this->modelClass}->saveField('last_login', date('Y-m-d H:i:s'));
+				}
 
 				if ($this->here == $this->Auth->loginRedirect) {
 					$this->Auth->loginRedirect = '/';
 				}
 				$this->Session->setFlash(sprintf(__d('users', '%s you have successfully logged in'), $this->Auth->user($this->{$this->modelClass}->displayField)));
-				if (!empty($this->request->data)) {
+				if (!empty($this->request->data[$this->modelClass])) {
 					$data = $this->request->data[$this->modelClass];
 					if (empty($this->request->data[$this->modelClass]['remember_me'])) {
 						$this->RememberMe->destroyCookie();
