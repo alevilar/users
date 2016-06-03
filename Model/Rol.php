@@ -49,6 +49,10 @@ class Rol extends AppModel {
 				// usar tenant para este model
 				$this->useDbConfig = $confName;	
 
+
+				$this->hasOne = array('Users.GenericUser');
+
+
 			}
 		}
 
@@ -81,13 +85,6 @@ class Rol extends AppModel {
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
-
-	/**
- * hasMany associations
- *
- * @var array
- */
-	public $hasOne = array('Users.GenericUser');
 
 
 /**

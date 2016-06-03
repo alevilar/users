@@ -880,12 +880,18 @@ class UsersController extends UsersAppController {
 	        ));
 
 	        $this->__doAuthLogin($user);
-	    } else {
-	    	// verificar que no se haya registrado con otra credencial
-	    	$existingUser = $this->User->find('first', array(
-		        'conditions' => array('email' => $incomingProfile['email']),
-		        'contain' => array('Site'),
-		    ));
+	    } else {	    	
+	    	if ( !empty($incomingProfile['email']) ) {
+		    	// verificar que no se haya registrado con otra credencial
+		    	$existingUser = $this->User->find('first', array(
+			        'conditions' => array('email' => $incomingProfile['email']),
+			        'contain' => array('Site'),
+			    ));
+	    	} else {
+	    		CakeLog::write('warning', 'Error procesando solicitud con el Proveedor Oauth');
+	    		debug($incomingProfile);
+	    		throw new CakeException(__d('users', 'Error procesando solicitud para ingresar con usuario de Redes Sociales'));
+	    	}
 		    if ( $existingUser ) {
 		    	// User exists but never (logged using oauth) saved UserProfile => save UserProfile
 	            $incomingProfile['user_id'] = $existingUser['User']['id'];
