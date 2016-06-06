@@ -638,7 +638,6 @@ class User extends UsersAppModel {
 		if ($removeExpiredRegistrations) {
 			$this->_removeExpiredRegistrations();
 		}
-
 		$this->set($postData);
 		if ($this->validates()) {
 			if ( empty( $postData[$this->alias]['password'] )) {

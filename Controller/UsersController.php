@@ -854,7 +854,12 @@ class UsersController extends UsersAppController {
 	    $result = $this->ExtAuth->loginCallback($provider);
 
 	    if ($result['success']) {
-	        $this->__successfulExtAuth($result['profile'], $result['accessToken']);
+	    	try {
+	    		
+	        	$this->__successfulExtAuth($result['profile'], $result['accessToken']);
+	    	} catch (Exception $e) {
+	    		$this->Session->setFlash("No se ha podido registrar con las credenciales. Pruebe con otra red social, o, por favor, crear una cuenta PaxaPos en lugar de usas sus cuentas existentes", 'Risto.flash_error');	
+	    	}
 	    } else {
 	        $this->Session->setFlash($result['message']);
 	    }
@@ -868,37 +873,58 @@ class UsersController extends UsersAppController {
 	    $oid = !empty($incomingProfile['oid']) ? $incomingProfile['oid'] : '';
 	    $oid = !empty($incomingProfile['id']) ? $incomingProfile['id'] : $oid;
 
+
+	    $conds = array('oid' => $oid);
+
 	    $existingProfile = $this->User->SocialProfile->find('first', array(
-	        'conditions' => array('oid' => $oid)
+	        'conditions' => $conds 
 	    ));
 
 	    if ($existingProfile) {
 
+	    	$conds['OR'] = array(
+        		'id' => $existingProfile['SocialProfile']['user_id'],
+        	);
+
+
+		    if ( !empty($incomingProfile['username']) ) {
+	    		$conds['OR']['User.username'] = $incomingProfile['username'];
+	    	}
+
+	    	if ( !empty($incomingProfile['email']) ) {
+	    		$conds['OR']['User.email'] = $incomingProfile['email'];
+	    	}
+
+
+	    	
+
 	        // Existing profile? log the associated user in.
 	        $user = $this->User->find('first', array(
-	            'conditions' => array('id' => $existingProfile['SocialProfile']['user_id'])
-	        ));
+	            'conditions' => $conds)
+	        );
 
 	        $this->__doAuthLogin($user);
 	    } else {
 	    	// verificar que no se haya registrado con otra credencial
-	    	$existingUser = $this->User->find('first', array(
-		        'conditions' => array('email' => $incomingProfile['email']),
-		        'contain' => array('Site'),
-		    ));
-		    if ( $existingUser ) {
-		    	// User exists but never (logged using oauth) saved UserProfile => save UserProfile
-	            $incomingProfile['user_id'] = $existingUser['User']['id'];
-	            $incomingProfile['oid'] = $oid;
-	            $incomingProfile['last_login'] = date('Y-m-d h:i:s');
-	            $incomingProfile['access_token'] = serialize($accessToken);
-	            $this->User->SocialProfile->save($incomingProfile);
-	            $this->Session->setFlash(__('Your %s account has been linked to user %s.', $incomingProfile['provider'], $existingUser['User']['username']));
+	    	if ( !empty( $incomingProfile['email'] ) ) {
+		    	$existingUser = $this->User->find('first', array(
+			        'conditions' => array('email' => $incomingProfile['email']),
+			        'contain' => array('Site'),
+			    ));
+			    if ( $existingUser ) {
+			    	// User exists but never (logged using oauth) saved UserProfile => save UserProfile
+		            $incomingProfile['user_id'] = $existingUser['User']['id'];
+		            $incomingProfile['oid'] = $oid;
+		            $incomingProfile['last_login'] = date('Y-m-d h:i:s');
+		            $incomingProfile['access_token'] = serialize($accessToken);
+		            $this->User->SocialProfile->save($incomingProfile);
+		            $this->Session->setFlash(__('Your %s account has been linked to user %s.', $incomingProfile['provider'], $existingUser['User']['username']));
 
-	            // log in
-	            $this->__doAuthLogin($existingUser);
-	            $this->redirect($this->Auth->redirectUrl());
-		    }
+		            // log in
+		            $this->__doAuthLogin($existingUser);
+		            $this->redirect($this->Auth->redirectUrl());
+			    }
+	    	}
 
 
 
@@ -916,8 +942,22 @@ class UsersController extends UsersAppController {
 
 	            // no-one logged in, must be a registration.
 	            unset($incomingProfile['id']);
+	            $this->User->validate['email']['isValid']['required'] = false;
+	            $this->User->validate['email']['isValid']['allowEmpty'] = true;
+	            $this->User->validate['email']['isUnique']['required'] = false;
+	            $this->User->validate['email']['isUnique']['allowEmpty'] = true;
+
+	            if ( empty( $incomingProfile['username'] ) ) {
+	            	if ( !empty($incomingProfile['email']) ) {
+	            		$incomingProfile['username'] = $incomingProfile['email'];
+	            	} else {
+	            		$incomingProfile['username'] = 'Usuario_'. substr( CakeText::uuid(), 7 );
+	            	}
+	            }
+	            
 	            $user = $this->User->register(array('User' => $incomingProfile), array('emailVerification'=>false));
-	            if (!$user) {	            	
+	            if (!$user) {	 
+
 	            	throw new CakeException(__d('users', 'Error registering users'));
 	            }
 	            // create social profile linked to new user
