@@ -855,10 +855,9 @@ class UsersController extends UsersAppController {
 
 	    if ($result['success']) {
 	    	try {
-	    		
 	        	$this->__successfulExtAuth($result['profile'], $result['accessToken']);
 	    	} catch (Exception $e) {
-	    		$this->Session->setFlash("No se ha podido registrar con las credenciales. Pruebe con otra red social, o, por favor, crear una cuenta PaxaPos en lugar de usas sus cuentas existentes", 'Risto.flash_error');	
+	    		$this->Session->setFlash("No se ha podido registrar con las credenciales. Pruebe con otra red social, o, por favor, crear una cuenta PaxaPos en lugar de usas sus cuentas existentes: ".$e->getMessage(), 'Risto.flash_error');	
 	    	}
 	    } else {
 	        $this->Session->setFlash($result['message']);
@@ -873,11 +872,8 @@ class UsersController extends UsersAppController {
 	    $oid = !empty($incomingProfile['oid']) ? $incomingProfile['oid'] : '';
 	    $oid = !empty($incomingProfile['id']) ? $incomingProfile['id'] : $oid;
 
-
-	    $conds = array('oid' => $oid);
-
 	    $existingProfile = $this->User->SocialProfile->find('first', array(
-	        'conditions' => $conds 
+	        'conditions' => array('SocialProfile.oid' => $oid) 
 	    ));
 
 	    if ($existingProfile) {
