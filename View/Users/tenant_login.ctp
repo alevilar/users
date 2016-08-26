@@ -73,48 +73,36 @@
 	var $p2 = $("#pin2");
 	var $p3 = $("#pin3");
 	var $p4 = $("#pin4");
+	var $form = $("#pinForm");
 
-		$p1.on('keypress', function() {
-			$p2.on('keypress', function() {				
-				$p3.on('keypress', function() {
-					$p4.on('keyup', function() {
-						if ($p1.val() && $p2.val() && $p3.val() && $p4.val() ) {
-							$("#pinForm").submit();
-						}
-					}).focus();
-				}).focus();
-			}).focus();
+	function apretarYseguir( $current ) {
+		$current.on('keyup', function(e) {
+			console.info("aprete p1");
+			if (e.keyCode==8) {
+				// back space
+		   		this.value="";
+		   		var $prev = $current.prev("input");
+		   		if ( $prev.length ) {
+		   			$prev.focus();
+		   		}
+			} else {
+				var $next = $current.next("input");
+				if ( $next.length ) {
+					apretarYseguir($next)
+				} else {
+					$form.submit();
+				}
+			}
 		} ).focus();
+	}
 
+	apretarYseguir($p1);
 
-		$p1.on('keydown', function(e) {
-			if (e.keyCode==8) {
-		   		$p1.val("");
-			}
-		 });
-		$p2.on('keydown', function(e) {
-			if (e.keyCode==8) {
-			   $p2.val("");
-			   $p1.focus();
-		   }
-		 });
-		$p3.on('keydown', function(e) {
-			if (e.keyCode==8) {
-			   $p3.val("");
-			   $p2.focus();
-		   }
-		 });
-		$p4.on('keydown', function(e) {
-			if (e.keyCode==8) {
-			   $p4.val("");
-			   $p3.focus();
-			}
-		 });
 
 	function ponerPin() {
 		$(".pin").val("");
 		$p1.focus();
 	};
-	ponerPin()();
+	ponerPin();
 	$(".pin").on('click', ponerPin );
 </script>
