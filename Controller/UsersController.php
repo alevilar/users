@@ -219,22 +219,7 @@ class UsersController extends UsersAppController {
 		if ($this->request->action == 'register') {
 			$this->Components->disable('Auth');
 		}
-/*
-		$this->Auth->authenticate = array(
-			'Form' => array(
-				'contain' => array('Site'),
-				'recursive' => 1,
-				'fields' => array(
-					'username' => 'email',
-					'password' => 'password'),
-				'userModel' => $this->_pluginDot() . $this->modelClass,
-				'scope' => array(
-					$this->modelClass . '.active' => 1,
-					// $this->modelClass . '.email_verified' => 1
-				)
-			)
-		);
-		*/
+
 	}
 
 
@@ -274,10 +259,10 @@ class UsersController extends UsersAppController {
  * @return void
  */
 	public function my_edit() {
-		$user = $this->Auth->user();
-		if ( empty($user) ) {
+		if ( !$this->Auth->loggedIn() ) {
 			throw new ForbiddenException(__("You must be logged in"));
 		}
+		$user = $this->Auth->user();
         if ( $this->request->is('post') || $this->request->is('put') ) {
                 if ($this->User->save( $this->request->data) ) {
                         $this->Session->setFlash(__('Se ha guardado la información correctamente'));

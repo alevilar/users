@@ -39,13 +39,15 @@
 			if (!empty($dataRaw->link)) {
 				// miro si es de facebook o google para luego mostrar
 				// como DISABLED el link de box_oauth_login
-				echo "<li>".$this->Html->link($dataRaw->link, $dataRaw->link, array('target'=>'_blank'))."</li>";
-				if ( strstr($dataRaw->link, 'facebook') !== false ) {
-					$fb = true;
-				}
-				if ( strstr($dataRaw->link, 'google') !== false ) {
-					$gg = true;
-				}
+				echo "<li>".$this->Html->link($sp['SocialProfile']['provider'], $dataRaw->link, array('target'=>'_blank'))."</li>";
+			} else {
+				echo "<li>".$sp['SocialProfile']['provider']."</li>";
+			}
+			if (  $sp['SocialProfile']['provider'] == 'Facebook' ) {
+				$fb = true;
+			}
+			if ( $sp['SocialProfile']['provider'] == 'Google' ) {
+				$gg = true;
 			}
 		}	
 		?>
