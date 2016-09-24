@@ -288,6 +288,13 @@ class UsersController extends UsersAppController {
         } else {
         	$this->request->data['User'] = $user;
         }
+        $socialProfiles = $this->User->SocialProfile->find('all', array(
+        	'recursive' => -1,
+        	'conditions' => array(
+        		'SocialProfile.user_id' => $user['id']
+        		),
+        	));
+        $this->set("socialProfiles", $socialProfiles);
 	}
 
 /**
@@ -866,6 +873,86 @@ class UsersController extends UsersAppController {
 	}
 
 
+	private function __loginExistingProfile( $existingProfile ){
+	    	$conds = array(
+        		'User.id' => $existingProfile['SocialProfile']['user_id'],
+        	);
+/*
+	    	if ( !empty($incomingProfile['email']) ) {
+	    		$conds['OR']['User.email'] = $incomingProfile['email'];
+	    	}
+*/
+	        // Existing profile? log the associated user in.
+	        $user = $this->User->find('first', array(
+	            'conditions' => $conds)
+	        );
+debug($user);
+	        $this->__doAuthLogin($user);
+	}
+
+
+	private function __loginExistingUserWithNoProfile( $user, $incomingProfile, $accessToken ){
+	    	
+
+	        // User exists but never (logged using oauth) saved UserProfile => save UserProfile
+            // $incomingProfile['user_id'] = $user['User']['id'];
+           	$incomingProfile['last_login'] = date('Y-m-d h:i:s');
+            $incomingProfile['access_token'] = serialize($accessToken);
+            $this->__attachProfileToUser($user['User']['id'], $incomingProfile);
+           
+            // log in
+            $this->__doAuthLogin($user);
+            $this->redirect($this->Auth->redirectUrl());
+	}
+
+
+	private function __attachProfileToUser( $userId, $incomingProfile ){
+        // user logged in already, attach profile to logged in user.
+        // create social profile linked to current user
+        $incomingProfile['user_id'] =  $userId;
+        if ( $this->User->SocialProfile->save($incomingProfile) ) {
+        	$this->Session->setFlash('Your ' . $incomingProfile['provider'] . ' account has been linked.');
+        } else {
+        	$this->Session->setFlash('Your ' . $incomingProfile['provider'] . ' account could not be linked.', 'Risto.flash_error');
+        }
+	}
+
+	private function __loginNewRegistration( $incomingProfile, $accessToken ) {
+		// no-one logged in, must be a registration.
+        unset($incomingProfile['id']);
+        $this->User->validate['email']['isValid']['required'] = false;
+        $this->User->validate['email']['isValid']['allowEmpty'] = true;
+        $this->User->validate['email']['isUnique']['required'] = false;
+        $this->User->validate['email']['isUnique']['allowEmpty'] = true;
+
+        if ( empty( $incomingProfile['username'] ) ) {
+        	if ( !empty($incomingProfile['email']) ) {
+        		$incomingProfile['username'] = $incomingProfile['email'];
+        	} else if ( !empty($incomingProfile['first_name']) || !empty($incomingProfile['last_name'])) {
+        		$nom = !empty($incomingProfile['first_name']) ? $incomingProfile['first_name']:"";
+        		$ape = !empty($incomingProfile['last_name']) ? $incomingProfile['last_name']:"";
+    			$username = Inflector::slug( $nom.$ape );
+        		$incomingProfile['username'] = $username."_" . substr( CakeText::uuid(), rand(0,36), 4 );
+        	} else {
+        		$incomingProfile['username'] = 'UsuarioOauth_'. substr( CakeText::uuid(), rand(0,36), 4 );
+        	}
+        }
+        
+        $user = $this->User->register(array('User' => $incomingProfile), array('emailVerification'=>false));
+        if (!$user) {	 
+        	throw new CakeException(__d('users', 'Error registering users'));
+        }
+        // create social profile linked to new user
+        $incomingProfile['user_id'] = $user['User']['id'];
+        $incomingProfile['last_login'] = date('Y-m-d h:i:s');
+        $incomingProfile['access_token'] = serialize($accessToken);
+        $this->User->SocialProfile->save($incomingProfile);
+
+        // log in
+        $this->__doAuthLogin($user);
+	}
+
+
 	private function __successfulExtAuth($incomingProfile, $accessToken) {
 	    // search for profile
 	    $this->User->SocialProfile->recursive = -1;
@@ -873,97 +960,37 @@ class UsersController extends UsersAppController {
 	    $oid = !empty($incomingProfile['id']) ? $incomingProfile['id'] : $oid;
 
 	    $existingProfile = $this->User->SocialProfile->find('first', array(
-	        'conditions' => array('SocialProfile.oid' => $oid) 
+	        'conditions' => array('SocialProfile.oid' => $oid),
+	        'contain' => array('User')
 	    ));
-
 	    if ($existingProfile) {
-
-	    	$conds['OR'] = array(
-        		'id' => $existingProfile['SocialProfile']['user_id'],
-        	);
-
-
-		    if ( !empty($incomingProfile['username']) ) {
-	    		$conds['OR']['User.username'] = $incomingProfile['username'];
-	    	}
-
-	    	if ( !empty($incomingProfile['email']) ) {
-	    		$conds['OR']['User.email'] = $incomingProfile['email'];
-	    	}
-
-
-	    	
-
-	        // Existing profile? log the associated user in.
-	        $user = $this->User->find('first', array(
-	            'conditions' => $conds)
-	        );
-
-	        $this->__doAuthLogin($user);
+	    	$this->__loginExistingProfile($existingProfile);
 	    } else {
-	    	// verificar que no se haya registrado con otra credencial
-	    	if ( !empty( $incomingProfile['email'] ) ) {
-		    	$existingUser = $this->User->find('first', array(
-			        'conditions' => array('email' => $incomingProfile['email']),
-			        'contain' => array('Site'),
-			    ));
-			    if ( $existingUser ) {
-			    	// User exists but never (logged using oauth) saved UserProfile => save UserProfile
-		            $incomingProfile['user_id'] = $existingUser['User']['id'];
-		            $incomingProfile['oid'] = $oid;
-		            $incomingProfile['last_login'] = date('Y-m-d h:i:s');
-		            $incomingProfile['access_token'] = serialize($accessToken);
-		            $this->User->SocialProfile->save($incomingProfile);
-		            $this->Session->setFlash(__('Your %s account has been linked to user %s.', $incomingProfile['provider'], $existingUser['User']['username']));
-
-		            // log in
-		            $this->__doAuthLogin($existingUser);
-		            $this->redirect($this->Auth->redirectUrl());
-			    }
-	    	}
-
-
 
 	        // New profile.
 	        if ($this->Auth->loggedIn()) {
-
-	            // user logged in already, attach profile to logged in user.
-	            // create social profile linked to current user
-	            $incomingProfile['user_id'] = $this->Auth->user('id');
-	            $this->User->SocialProfile->save($incomingProfile);
-	            $this->Session->setFlash('Your ' . $incomingProfile['provider'] . ' account has been linked.');
+	        	// user logged in already, attach profile to logged in user.
+        		// create social profile linked to current user
+        		$userId = $this->Auth->user('id');
+	        	$this->__attachProfileToUser( $userId, $incomingProfile );
 	            $this->redirect($this->Auth->redirectUrl());
 
 	        } else {
 
-	            // no-one logged in, must be a registration.
-	            unset($incomingProfile['id']);
-	            $this->User->validate['email']['isValid']['required'] = false;
-	            $this->User->validate['email']['isValid']['allowEmpty'] = true;
-	            $this->User->validate['email']['isUnique']['required'] = false;
-	            $this->User->validate['email']['isUnique']['allowEmpty'] = true;
+	        	// verificar que no se haya registrado con otra credencial
+		    	if ( !empty( $incomingProfile['email'] ) ) {
+			    	$user = $this->User->find('first', array(
+				        'conditions' => array('User.email' => $incomingProfile['email']),
+				        'contain' => array('Site'),
+				    ));
+				    if ( $user ) {
+				    	// crea el nuevo profile,. lo vincula con el usuario y logea
+				    	$this->__loginExistingUserWithNoProfile( $user, $incomingProfile, $accessToken );
+				    }
+		    	}
 
-	            if ( empty( $incomingProfile['username'] ) ) {
-	            	if ( !empty($incomingProfile['email']) ) {
-	            		$incomingProfile['username'] = $incomingProfile['email'];
-	            	} else {
-	            		$incomingProfile['username'] = 'Usuario_'. substr( CakeText::uuid(), 7 );
-	            	}
-	            }
-	            
-	            $user = $this->User->register(array('User' => $incomingProfile), array('emailVerification'=>false));
-	            if (!$user) {	 
 
-	            	throw new CakeException(__d('users', 'Error registering users'));
-	            }
-	            // create social profile linked to new user
-	            $incomingProfile['user_id'] = $user['User']['id'];
-	            $incomingProfile['last_login'] = date('Y-m-d h:i:s');
-	            $incomingProfile['access_token'] = serialize($accessToken);
-	            $this->User->SocialProfile->save($incomingProfile);
-
-	            // log in
-	            $this->__doAuthLogin($user);
+	        	$this->__loginNewRegistration( $incomingProfile, $accessToken );
 	        }
 	    }
 	}
