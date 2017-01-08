@@ -77,7 +77,6 @@
 
 	function apretarYseguir( $current ) {
 		$current.on('keyup', function(e) {
-			console.info("aprete p1");
 			if (e.keyCode==8) {
 				// back space
 		   		this.value="";
