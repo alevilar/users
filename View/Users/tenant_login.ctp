@@ -5,31 +5,7 @@
 			
 		<div class="user-login text-center col-sm-4 col-xs-12 col-sm-offset-2">	
 			<h3 class="blue">Usuarios</h3>
-			<h1 class="center black-5">PIN</h1>
-			<?php echo $this->Form->create('GenericUser', array( 'id'=>'pinForm'));?>
-
-						<?php echo $this->Form->password('k1', array(
-							'class' => 'form-control input-lg pin',
-							'id' => 'pin1',
-							'maxlength' => 1
-						))?>
-						<?php echo $this->Form->password('k2', array(
-							'class' => 'form-control input-lg pin',
-							'id' => 'pin2',
-							'maxlength' => 1
-						))?>
-						<?php echo $this->Form->password('k3', array(
-							'class' => 'form-control input-lg pin',
-							'id' => 'pin3',
-							'maxlength' => 1
-						))?>
-						<?php echo $this->Form->password('k4', array(
-							'class' => 'form-control input-lg pin pin input-block',
-							'id' => 'pin4',
-							'maxlength' => 1
-						))?>
-
-			<?php echo $this->Form->end();?>
+			<?php echo $this->element('Users.pin_login'); ?>
 		</div>
 
 
@@ -69,39 +45,4 @@
 
 <script type="text/javascript">
 
-	var $p1 = $("#pin1");
-	var $p2 = $("#pin2");
-	var $p3 = $("#pin3");
-	var $p4 = $("#pin4");
-	var $form = $("#pinForm");
-
-	function apretarYseguir( $current ) {
-		$current.on('keyup', function(e) {
-			if (e.keyCode==8) {
-				// back space
-		   		this.value="";
-		   		var $prev = $current.prev("input");
-		   		if ( $prev.length ) {
-		   			$prev.focus();
-		   		}
-			} else {
-				var $next = $current.next("input");
-				if ( $next.length ) {
-					apretarYseguir($next)
-				} else {
-					$form.submit();
-				}
-			}
-		} ).focus();
-	}
-
-	apretarYseguir($p1);
-
-
-	function ponerPin() {
-		$(".pin").val("");
-		$p1.focus();
-	};
-	ponerPin();
-	$(".pin").on('click', ponerPin );
 </script>
