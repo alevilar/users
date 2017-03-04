@@ -564,6 +564,24 @@ class User extends UsersAppModel {
 	}
 
 /**
+ * Buscar usuarios con las IDs del filtrado previo de usuarios por sitio (comercio).
+ * Se usa para sacar los usernames y así crear la lista de usuarios (select) del action
+ * cambiar_creador (para los arqueos). El is_admin va como condición que sea 0 para evitar
+ * que los admins que puedan entrar en comercios de otros usuarios para brindar un mejor soporte
+ * aparezcan en dicho listado.
+ *
+ * @param array $users con ids de usuarios.
+ * @return array $usernames['id_usuario' => 'nombre_usuario'];
+ */
+    public function findById($users) {
+
+    	$usernames[] = array($this->find('list',array(
+    		'conditions' => array('id' => $users, 'is_admin' => 0)))); 
+       
+       return $usernames;
+    } 
+
+/**
  * Checks if an email is already verified and if not renews the expiration time
  *
  * @param array $postData the post data from the request

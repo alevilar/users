@@ -92,9 +92,11 @@ class GenericUsersController extends UsersAppController {
 			$options = array('conditions' => array('GenericUser.' . $this->GenericUser->primaryKey => $id));
 			$this->request->data = $this->GenericUser->find('first', $options);
 		}
+		debug($rol_id);
 		$this->request->data['GenericUser']['rol_id'] = $rol_id;
 		$roles = $this->GenericUser->Rol->find('list');
-		$rolName = $this->GenericUser->Rol->field('name', $rol_id);
+		$rolName = $this->GenericUser->Rol->find('list', array('conditions' => array('id' => $rol_id)));
+		$rolName = implode('', $rolName);
 		$this->set(compact('roles', 'rolName'));
 		$this->render("form");
 	}
