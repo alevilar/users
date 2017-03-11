@@ -55,30 +55,6 @@ class GenericUser extends AppTenantModel {
 		)
 	);
 
-public function beforesave($options = array()) {
-
-	$id = $this->data['GenericUser']['rol_id'];
-
-	switch ($id) {
-		case ROL_ID_MOZO:
-			$this->data['GenericUser']['name'] = 'Mozo';
-			break;
-		
-		case ROL_ID_CAJERO:
-			$this->data['GenericUser']['name'] = 'Cajero';
-			break;
-
-		case ROL_ID_ENCARGADO:
-			$this->data['GenericUser']['name'] = 'Encargado';
-			break;
-
-		case ROL_ID_COCINERO:
-			$this->data['GenericUser']['name'] = 'Cocinero';
-			break;
-	}
-  return true;
-}
-
 /**
  * lista todos los usuarios genericos
  *
