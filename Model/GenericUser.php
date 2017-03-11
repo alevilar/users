@@ -85,8 +85,16 @@ public function beforesave($options = array()) {
  * @return array
  */
 
-public function buscarGenericos() {
-	return $this->find('list');
+public function listarGenericosConNombreRol() {
+	$usuariosGenericos =  $this->find('all', array(
+		'contain' => array(
+			'Rol'
+			)
+		));
+
+
+	return Hash::combine($usuariosGenericos, '{n}.GenericUser.id', '{n}.Rol.name');
+
 }
 
 }
