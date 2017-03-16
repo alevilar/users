@@ -8,35 +8,25 @@
  * @copyright Copyright 2010 - 2014, Cake Development Corporation (http://cakedc.com)
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-$this->element("Risto.layout_modal_edit", array('title' => 'Vinculación de Usuario con tu Comercio'));
 ?>
 <div class="users index">
 
 	<div class="btn-group pull-right">
-	<?php echo $this->Html->link(__('Crear nuevo %s', __('Usuario')), array('admin'=>true,'plugin'>'users', 'controller'=> 'SiteUsers', 'action'=>'add'), array('class'=>'btn btn-success btn-lg btn-add')); ?>	
+	<?php echo $this->Html->link(__('Create New %s', __('User')), array('admin'=>true,'plugin'>'site_users', 'controller'=> 'site_users', 'action'=>'add'), array('class'=>'btn btn-success btn-lg')); ?>	
 	</div>
 
 	<h2><?php echo __d('users', 'Users'); ?></h2>
-<br>
+
 	<?php
 		if (CakePlugin::loaded('Search')) {
-		?>
-		<div class="row">               
-		<?php echo $this->Form->create($model, array( 'url' => array('action' => 'index') ));?>		
-        <div class="col-xs-6 col-sm-6 col-md-6">                
-		<?php echo $this->Form->input('txt_search', array('label' => false, 'placeholder' => 'Escribe aquí datos del usuario buscado para realizar una busqueda.'));?>
-        </div>
-        <div class="col-xs-6 col-sm-6 col-md-6">               
-        <?php echo $this->Form->submit('Buscar', array('class' => 'btn btn-default'));?>
-        </div>      
-		<?php echo $this->Form->end();?>
-		</div>
-	<?php
+			echo $this->Form->create('User');
+				echo $this->Form->input('txt_search', array('label' => __d('users', 'Search')));
+			echo $this->Form->end(__d('users', 'Search'));
 		}
 	?>
-    <div class="center">
+
 	<?php echo $this->element('Users.paging'); ?>
-	</div>
+	<?php echo $this->element('Users.pagination'); ?>
 	<table class="table">
 		<tr>
 			<th><?php echo $this->Paginator->sort('username'); ?></th>
@@ -87,24 +77,39 @@ $this->element("Risto.layout_modal_edit", array('title' => 'Vinculación de Usua
 				</td>
 				<td class="actions">
 
-                <div class="btn-group">
-                  <?php echo $this->Html->link(__('Editar'), array('action'=>'edit', $user[$model]['id']), array('class'=>'btn btn-default btn-sm btn-edit')); ?>
+					<div class="dropdown">
+						    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+						    <?php echo __('Options') ?>
+						    <span class="caret"></span>
+						  </button>
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+					    <li role="presentation">
+					    	<?php echo $this->Html->link(__d('users', 'Edit')
+					    				, array('action' => 'edit', $user[$model]['id'])
+					    				, array('role'=>'menuitem')
+					    				); ?>
+					    </li>
+					    <li role="presentation">
+					    <?php echo $this->Html->link(__d('users', 'Assign Other Site'), array('action' => 'assign_other_site', $user[$model]['id'])); ?>
+					    </li>
 
-                  <button type="button" class="btn btn-default  btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="caret"></span>
-                    <span class="sr-only">Toggle Dropdown</span>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li class="">
-					    	<?php echo $this->Form->postLink(__d('users', 'Delete'), array('action' => 'delete', $user[$model]['id']), null, sprintf(__d('users', '¿Estas seguro que quieres desvincular a %s de tu comercio?'), $user[$model]['username'])); ?>
-					</li>
-                  </ul>
-                </div>
+					    <li role="presentation">
+					    	<?php echo $this->Form->postLink(__d('users', 'Delete'), array('action' => 'delete', $user[$model]['id']), null, sprintf(__d('users', 'Are you sure you want to delete The User # %s?'), $user[$model]['id'])); ?>
+
+					    </li>
+
+					    <li role="presentation" class="divider"></li>
+
+					    <li role="presentation">
+					    	<?php echo $this->Form->postLink(__d('users', 'Dismiss from site'), array('action' => 'delete_from_tenant', $user[$model]['id']), null, sprintf(__d('users', 'Are you sure you want to delete from this site # %s?'), $user[$model]['id'])); ?>
+					    </li>
+					  </ul>
+					</div>
 					
 					
 				</td>
 			</tr>
 		<?php endforeach; ?>
 	</table>
-	<?php echo $this->element('Risto.pagination'); ?>
+	<?php echo $this->element('Users.pagination'); ?>
 </div>

@@ -1,4 +1,4 @@
 <?php 
 	echo $this->Paginator->counter(array(
-		'format' => 'Page %page% of %pages%, showing %current% records out of %count% total, starting on record %start%, ending on %end%')); 
+		'format' => 'Página %page% de %pages%, mostrando %current% registros de un total de %count%, empezando en el registro %start% y finalizando en el registro %end%.')); 
 ?>
