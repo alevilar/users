@@ -8,6 +8,7 @@
  * @copyright Copyright 2010 - 2014, Cake Development Corporation (http://cakedc.com)
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+$this->element("Risto.layout_modal_edit", array('title' => 'Vinculación de Usuario con tu Comercio'));
 ?>
 <div class="users index">
 
