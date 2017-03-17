@@ -31,7 +31,6 @@
 		<tr>
 			<th><?php echo $this->Paginator->sort('username'); ?></th>
 			<th><?php echo $this->Paginator->sort('email'); ?></th>
-			<th><?php echo $this->Paginator->sort('Rol'); ?></th>
 			<th><?php echo $this->Paginator->sort('active'); ?></th>
 			<th><?php echo $this->Paginator->sort('last_login'); ?></th>
 			<th class="actions"><?php echo __d('users', 'Actions'); ?></th>
@@ -52,17 +51,7 @@
 					<spam class="email-verified"><?php echo $user[$model]['email_verified'] == 1 ? "✓" : "✕"; ?></spam>
 					<?php echo $user[$model]['email']; ?>
 				</td>
-				<td>
-					<?php
-					$roles = '';
-					if (array_key_exists('Rol', $user)) {
-						foreach ($user['Rol'] as $rol ) {
-							$roles .= ", " .$rol['name'];
-						} 
-						echo trim($roles, ',');
-					}
-					?>
-				</td>
+
 
 
 				<td>
