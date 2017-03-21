@@ -288,6 +288,11 @@ class UsersController extends UsersAppController {
  * @return void
  */
 	public function index() {
+		if ( !MtSites::isTenant()) {
+        	throw new ForbiddenException( __("El Tenant no es válido o no fue encontrado en el sistema"));
+        }
+
+
 		if ($this->{$this->modelClass}->Behaviors->loaded('Searchable')) {
 			$this->Prg->commonProcess();
 			unset($this->{$this->modelClass}->validate['username']);
@@ -1006,7 +1011,4 @@ debug($user);
 	        $this->redirect( $redUrl );
 	    }
 	}
-
-
-
 }

@@ -49,7 +49,7 @@
 			?>
 
 
-			<?php echo $this->Form->button(__('Registrar nuevo usuario'), array('class'=>'btn btn-success')); ?>	
+			<?php echo $this->Form->button(__('Registrar nuevo usuario'), array('class'=>'btn btn-primary')); ?>	
 			<?php echo $this->Html->link(__('Cancelar'), array('action'=>'index'), array('class'=>'btn btn-default pull-right') ); ?>	
 		
 

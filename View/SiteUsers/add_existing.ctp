@@ -18,21 +18,16 @@
 
 
 			<?php
-				echo $this->Form->input('username', array(
-					'label' => __d('users', 'Username')
-					));
-				echo $this->Form->input('email', array(
-					'label' => __d('users', 'Email')));
 				if (!empty($roles)) {
-					echo $this->Form->input('Rol', array(
-						'label' => __d('users', 'Role')
-						));
+					echo $this->Form->select('Rol', array($roles), 
+						array('class' => 'form-control', 
+							  'empty' => 'Seleccionar rol del usuario')
+						);
 				}
-
 			?>
+			<br>
 
-
-			<?php echo $this->Form->button(__('Añadir usuario existente en mi comercio'), array('class'=>'btn btn-danger')); ?>		
+			<?php echo $this->Form->button(__('Añadir usuario existente en mi comercio'), array('class'=>'btn btn-primary')); ?>		
 
 			<?php echo $this->Html->link(__('Cancelar'), array('action'=>'index'), array('class' => 'btn btn-default pull-right')); ?>
 

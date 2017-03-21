@@ -25,15 +25,16 @@
 	</div>
 	<table class="table">
 		<tr>
-			<th><?php echo $this->Paginator->sort('username'); ?></th>
-			<th><?php echo $this->Paginator->sort('email'); ?></th>
-		<?php if (empty($sinRol)) { ?>	<th><?php echo $this->Paginator->sort('Rol'); ?></th> <?php } ?>
-			<th><?php echo $this->Paginator->sort('active'); ?></th>
-			<th><?php echo $this->Paginator->sort('last_login'); ?></th>
-			<th class="actions"><?php echo __d('users', 'Actions'); ?></th>
+			<th><?php echo $this->Paginator->sort('Nombre de usuario'); ?></th>
+			<th><?php echo $this->Paginator->sort('E-Mail'); ?></th>
+		<?php if (empty($sinTenant)) { ?>	<th><?php echo $this->Paginator->sort('Rol'); ?></th> <?php } ?>
+			<th><?php echo $this->Paginator->sort('Activo'); ?></th>
+			<th><?php echo $this->Paginator->sort('Ultima vez conectado'); ?></th>
+			<th class="actions"><?php echo __d('users', 'Acciones'); ?></th>
 		</tr>
 			<?php
 			$i = 0;
+			$userOffset = 0;
 			foreach ($users as $user):
 				$class = null;
 				if ($i++ % 2 == 0) :
@@ -50,7 +51,7 @@
 				</td>
 
 				<?php
-				if (empty($sinRol)) {
+				if (empty($sinTenant)) {
 				?>
 				<td>
 				<?php
@@ -73,8 +74,8 @@
 				<td>
 					<?php 
 					echo $user[$model]['last_login'] ?
-							$this->Time->timeAgoInWords( $user[$model]['last_login'])
-							: __d('users','never'); 
+							$this->Time->nice( $user[$model]['last_login'])
+							: __d('users','Nunca'); 
 					?>
 				</td>
 				<td class="actions">
@@ -87,15 +88,63 @@
                     <span class="sr-only">Toggle Dropdown</span>
                   </button>
                   <ul class="dropdown-menu">
-                    <li class="">
-					    	<?php echo $this->Form->postLink(__d('users', 'Delete'), array('action' => 'delete', $user[$model]['id']), null, sprintf(__d('users', '¿Estas seguro que quieres desvincular a %s de tu comercio?'), $user[$model]['username'])); ?>
-					</li>
+                  <?php
+
+                  if (empty($conTenant)) {
+                   	$controlador = 'users';
+                   	$accion = 'delete';
+                   	$buttonName = 'Borrar Usuario';
+                   	$mensaje = '¿Estas seguro que quieres borrar a %s de PaxaPos?';
+                   } else {
+                   	$controlador = 'SiteUsers';
+                   	$accion = 'delete_from_tenant';
+                   	$buttonName = 'Quitar del comercio';
+                   	$mensaje = '¿Estas seguro que quieres desvincular a %s de tu comercio?';
+                   }
+                  ?>
+                  <li class="">
+                  <?php
+                  echo $this->Html->Link(__d('users', 'Añadir a otro comercio'), 
+                  array('controller' => 'SiteUsers', 'action' => 'assign_other_site', $user[$model]['id']), 
+                  array('class' => 'btn-add')); 
+
+                  if (empty($sinTenant)) {
+                  $siteOffset = 0;
+                  $userOnSite = 0;
+                  
+
+                  	while(!empty($users[$userOffset]['Site'][$siteOffset])) { //si el indice no esta vacio...
+                  	 if ($users[$userOffset]['Site'][$siteOffset]['alias'] == $site_alias) {
+                       $userOnSite = $userOnSite + 1; /*se comprueba que el alias sea igual al alias del tenant actual
+                                                      Si es igual, se suma uno.*/
+                     }
+                     $siteOffset = $siteOffset + 1;
+                   }
+                   $userOffset = $userOffset + 1;
+
+                   if($userOnSite >= 1) { //Si es igual o mayor a uno, muestra el botón de quitar del comercio.
+                    echo $this->Form->postLink(__d('users', $buttonName), 
+                  	array('controller' => $controlador, 'action' => $accion, $user[$model]['id']), null, 
+                  	sprintf(__d('users', $mensaje), $user[$model]['username']));
+                       } else { //Sino, muestra el de agregar.
+                  ?>
+                   <?php 
+                    echo $this->Html->Link(__d('users', 'Añadir al comercio actual'), 
+                   	array('controller' => 'SiteUsers', 'action' => 'add_existing', $user[$model]['id']), 
+                   	array('class' => 'btn-add')); 
+                      }
+                  } else { //Si $sinTenant esta vacio, muestra el botón de borrar usuario del sistema.         
+                   echo $this->Form->postLink(__d('users', $buttonName), array('controller' => $controlador, 'action' => $accion, $user[$model]['id']), null, sprintf(__d('users', $mensaje), $user[$model]['username']));
+                  }
+                   ?>
+                  </li>
                   </ul>
                 </div>
 					
 					
 				</td>
 			</tr>
-		<?php endforeach; ?>
+		<?php 
+		endforeach; ?>
 	</table>
 	<?php echo $this->element('Risto.pagination'); ?>

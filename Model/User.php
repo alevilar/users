@@ -93,6 +93,7 @@ class User extends UsersAppModel {
 			'limit' => '',
 			'offset' => '',
 			'finderQuery' => '',
+			'with' => 'MtSites.SitesUsers'
 		),
 		'Rol' => array(
 			'className' => 'Users.Rol',
@@ -1055,11 +1056,11 @@ class User extends UsersAppModel {
     	if ( is_null( $user_id) ) {
     		$user_id = $this->id;
     	}
+    	
+    	$siteUser['site_id'] = $site_id;
+		$siteUser['user_id'] = $user_id;
 
-    	$siteUser['SiteUser']['site_id'] = $site_id;
-		$siteUser['SiteUser']['user_id'] = $user_id;
-
-		return $this->SiteUser->save($siteUser);
+		return $this->SitesUsers->save($siteUser);
     }
 
     public function addRoleIntoSite ( $rol_id, $user_id = null ) {
@@ -1081,10 +1082,10 @@ class User extends UsersAppModel {
     	}
     	$this->Site->recursive = -1;
     	$site = $this->Site->findByAlias($site_alias);
-    	$siteUser['SiteUser.site_id'] = $site['Site']['id'];
-		$siteUser['SiteUser.user_id'] = $user_id;
+    	$siteUser['site_id'] = $site['Site']['id'];
+		$siteUser['user_id'] = $user_id;
 
-		return $this->SiteUser->deleteAll($siteUser);
+		return $this->SitesUsers->deleteAll($siteUser, false);
     }
 
 }

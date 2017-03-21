@@ -10,8 +10,8 @@
  */
 $this->element("Risto.layout_modal_edit", array('title' => 'Vinculación de Usuario con tu Comercio'));
 ?>
-<div class="users index">
+<div class="users index content-white">
 
-<?php echo $this->element('Users.listado_usuarios', array('sinRol' => true)); ?>
+<?php echo $this->element('Users.listado_usuarios', array('sinTenant' => true)); ?>
 
 </div>

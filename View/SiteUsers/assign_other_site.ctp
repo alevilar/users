@@ -10,24 +10,21 @@
  */
 ?>
 <div class="users form">
-	<?php echo $this->Form->create($model, array('type'=>'post')); ?>
+<h3>Usuario: <?php echo $user['User']['username'];?></h3>
+<?php 
+echo $this->Form->create($model, array('type'=>'post')); 
+?>
 		<fieldset>
-			<p>
-			Desde aquí puede asignar usuarios existentes en PaxaPOS, para ello debe ingresar el nombre de usuario y email válido. En caso de no existir esa combinación, se creará un nuevo usuario para que pueda utilizarlo en este sitio
-			</p>
-			<legend><?php echo __d('users', 'Assign Other Site to User %s', $this->request->data[$model]['username']); ?></legend>
 
-			<?php
-				echo $this->Form->input('id');
-
-				echo $this->Form->input('Site', array(
-					'label' => __d('users', 'Site')
-					));
-			
-			?>
+<?php echo $this->Form->select('site', array($sites), 
+	  array('class' => 'form-control', 'empty' => 'Seleccione el sitio')); ?>
+<br>
+<?php echo $this->Form->select('rol', array($roles), 
+	  array('class' => 'form-control', 'empty' => 'Seleccione el rol')); ?>
+<br>
 		</fieldset>
-	<?php echo $this->Form->button('Submit', array('class'=>'btn btn-success')); ?>		
-	<?php echo $this->Html->link(__('Cancel'), array('action'=>'index'), array('class'=>'btn btn-default') ); ?>
+	<?php echo $this->Form->button('Enviar', array('class'=>'btn btn-success')); ?>		
+	<?php echo $this->Html->link(__('Cancelar'), array('action'=>'index'), array('class'=>'btn btn-default') ); ?>
 
 	<?php echo $this->Form->end(); ?>
 </div>
