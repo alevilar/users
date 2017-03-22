@@ -10,9 +10,11 @@
 		<div class="row">               
 		<?php
 		if(empty($adminPanel)) {
-
+			$controlador = 'SiteUsers';
+		} else {
+			$controlador = 'users';
 		}
-		echo $this->Form->create($model);
+		echo $this->Form->create('User', array('url' => array('controller' => $controlador,'action' => 'index')));
 		?>		
         <div class="col-xs-6 col-sm-6 col-md-6">                
 		<?php echo $this->Form->input('txt_search', array('label' => false, 'placeholder' => 'Escribe aquí datos del usuario buscado para realizar una busqueda.'));?>

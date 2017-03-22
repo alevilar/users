@@ -32,10 +32,26 @@ class SiteUsersController extends UsersAppController {
 
 		$site_alias = MtSites::getSiteName();
 
+		$user_id = Cakesession::read('Auth.User.id');
+
+		$parsedConditions = array(
+            	'User.id !=' => $user_id,
+            	'is_admin' => 0,
+            	);
+
+		if ($this->{$this->modelClass}->Behaviors->loaded('Searchable')) {
+			$parsedConditions = $parsedConditions + $this->{$this->modelClass}->parseCriteria($this->passedArgs);
+		}
+
 		$this->Paginator->settings[$this->modelClass] = array(
+            'conditions' => array(
+            	'User.id !=' => $user_id,
+            	'is_admin' => 0,
+            	),
 			'recursive' => 1,			
 		);
 
+        $this->Paginator->settings[$this->modelClass]['conditions'] = $parsedConditions;
 		$this->set('users', $this->Paginator->paginate());
 		$this->set(compact('site_alias'));		
 	}
@@ -96,16 +112,19 @@ class SiteUsersController extends UsersAppController {
 			    		'rol_id' => $this->request->data['Rol']['Rol'],
 			    		'user_id' => $userId,
 			    		);
-			}
+			
 
 			$this->{$this->modelClass}->RolUser->deleteAll(array('RolUser.user_id' => $userId ));
 
 			if ( $this->{$this->modelClass}->RolUser->saveMany( $rolUser ) ) {
 				$this->Session->setFlash(__d('users', 'User saved'));
-				$this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__d('users', 'Error saving'), 'Risto.flash_error');
 			}
+		  } else {
+		  	$this->Session->setFlash(__d('users', 'Error: no has elegido el rol del usuario, intentelo de nuevo.'), 'Risto.flash_error');
+		  }
+		  $this->redirect(array('action' => 'index'));
 		}
 
 		if (empty($this->request->data)) {
