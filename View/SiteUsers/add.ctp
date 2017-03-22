@@ -34,10 +34,16 @@
 					'type' => 'email',
 					));
 				if (!empty($roles)) {
-					echo $this->Form->input('Rol', array(
-						'label' => __d('users', 'Role')
-						));
-				}
+					?>
+                    <label><b>Rol</b></label>
+					<?php
+					echo $this->Form->select('Rol', array($roles), 
+	                array('class' => 'form-control', 'empty' => 'Seleccione el rol', 'label' => __d('users', 'Rol')));
+				} ?>
+
+				<br>
+
+				<?php
 
 				echo $this->Form->input('password', array(
 					'label' => __d('users', 'Password'),

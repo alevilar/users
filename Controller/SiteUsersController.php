@@ -91,15 +91,11 @@ class SiteUsersController extends UsersAppController {
 		    ));
 
 			$rolUser = array();
-			debug($this->request->data);
 			if (!empty($this->request->data['Rol']['Rol'])) {
-			    foreach ($this->request->data['Rol']['Rol'] as $rolId )  {
 			    	$rolUser[] = array(
-			    		'rol_id' => $rolId,
+			    		'rol_id' => $this->request->data['Rol']['Rol'],
 			    		'user_id' => $userId,
 			    		);
-			    }
-
 			}
 
 			$this->{$this->modelClass}->RolUser->deleteAll(array('RolUser.user_id' => $userId ));
@@ -133,6 +129,8 @@ class SiteUsersController extends UsersAppController {
 		if ( $this->request->is('post') ) {
 			$alias = MtSites::getSiteName();			
 			if ( $this->{$this->modelClass}->dismissUserFromSite($alias, $user_id) ) {
+				$user['user_id'] = $user_id;
+				$this->User->RolUser->deleteAll($user, false);
 				$this->Session->setFlash(__d('users','El usuario fue removido satisfactoriamente del comercio'));
 			} else {
 				$this->Session->setFlash(__d('users','Error al remover al usuario del comercio.'), 'Risto.flash_error');
@@ -175,11 +173,12 @@ class SiteUsersController extends UsersAppController {
 				$this->redirect(array('action' => 'index'));
 			} elseif ( $wasFound ) {
 				// assign user Rol & Site
-
+ 
 				if (!empty($this->request->data['Rol']['Rol'][0]) || !empty($rol_id)) {
 					if($rol_id == null) {
 					$rol_id = $this->request->data['Rol']['Rol'][0];
 				    }
+				    debug($rol_id); die; 
 
 					$this->{$this->modelClass}->hasAndBelongsToMany['Rol']['unique'] = false;
 					if ( $this->{$this->modelClass}->addRoleIntoSite($rol_id, $user_id) ) {
@@ -196,8 +195,12 @@ class SiteUsersController extends UsersAppController {
 						$this->Session->setFlash(__d('users', 'Error guardando el rol del usuario'), 'Risto.flash_error');
 					}
 					$this->redirect(array('action' => 'index'));
+				} else {
+					$this->Session->setFlash(__d('users', 'Error: no has elegido el rol del usuario, intentelo de nuevo.'), 'Risto.flash_error');
 				}
-				
+
+				$this->redirect(array('action' => 'index'));
+
 			} else{
 				debug($wasFound);
 				$this->Session->setFlash(__d('users', 'El usuario no pudo ser encontrado'), 'Risto.flash_error');
@@ -208,7 +211,7 @@ class SiteUsersController extends UsersAppController {
 		$this->set(compact( 'roles'));
 	}
 
-    public function assign_other_site($user_id = null) {
+    public function assign_other_site($user_id) {
 
 		if ($this->request->is('post','put','ajax')) {
 			$site_id = $this->request->data['User']['site'];

@@ -12,6 +12,6 @@ $this->element("Risto.layout_modal_edit", array('title' => 'Vinculación de Usua
 ?>
 <div class="users index content-white">
 
-<?php echo $this->element('Users.listado_usuarios', array('conTenant' => true)); ?>
+<?php echo $this->element('Users.listado_usuarios', array('userPanel' => true)); ?>
 
 </div>

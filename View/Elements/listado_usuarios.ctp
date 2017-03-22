@@ -8,7 +8,12 @@
 		if (CakePlugin::loaded('Search')) {
 		?>
 		<div class="row">               
-		<?php echo $this->Form->create($model, array( 'url' => array('action' => 'index') ));?>		
+		<?php
+		if(empty($adminPanel)) {
+
+		}
+		echo $this->Form->create($model);
+		?>		
         <div class="col-xs-6 col-sm-6 col-md-6">                
 		<?php echo $this->Form->input('txt_search', array('label' => false, 'placeholder' => 'Escribe aquí datos del usuario buscado para realizar una busqueda.'));?>
         </div>
@@ -27,7 +32,7 @@
 		<tr>
 			<th><?php echo $this->Paginator->sort('Nombre de usuario'); ?></th>
 			<th><?php echo $this->Paginator->sort('E-Mail'); ?></th>
-		<?php if (empty($sinTenant)) { ?>	<th><?php echo $this->Paginator->sort('Rol'); ?></th> <?php } ?>
+		<?php if (empty($adminPanel)) { ?>	<th><?php echo $this->Paginator->sort('Rol'); ?></th> <?php } ?>
 			<th><?php echo $this->Paginator->sort('Activo'); ?></th>
 			<th><?php echo $this->Paginator->sort('Ultima vez conectado'); ?></th>
 			<th class="actions"><?php echo __d('users', 'Acciones'); ?></th>
@@ -51,7 +56,7 @@
 				</td>
 
 				<?php
-				if (empty($sinTenant)) {
+				if (empty($adminPanel)) {
 				?>
 				<td>
 				<?php
@@ -90,7 +95,7 @@
                   <ul class="dropdown-menu">
                   <?php
 
-                  if (empty($conTenant)) {
+                  if (empty($userPanel)) {
                    	$controlador = 'users';
                    	$accion = 'delete';
                    	$buttonName = 'Borrar Usuario';
@@ -108,7 +113,7 @@
                   array('controller' => 'SiteUsers', 'action' => 'assign_other_site', $user[$model]['id']), 
                   array('class' => 'btn-add')); 
 
-                  if (empty($sinTenant)) {
+                  if (empty($adminPanel)) {
                   $siteOffset = 0;
                   $userOnSite = 0;
                   
@@ -133,7 +138,7 @@
                    	array('controller' => 'SiteUsers', 'action' => 'add_existing', $user[$model]['id']), 
                    	array('class' => 'btn-add')); 
                       }
-                  } else { //Si $sinTenant esta vacio, muestra el botón de borrar usuario del sistema.         
+                  } else { //Si $adminPanel esta vacio, muestra el botón de borrar usuario del sistema.         
                    echo $this->Form->postLink(__d('users', $buttonName), array('controller' => $controlador, 'action' => $accion, $user[$model]['id']), null, sprintf(__d('users', $mensaje), $user[$model]['username']));
                   }
                    ?>

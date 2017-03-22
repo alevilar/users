@@ -30,10 +30,13 @@
 					'disabled' => true,
 					));
 				if (!empty($roles)) {
-					echo $this->Form->input('Rol', array(
-						'label' => __d('users', 'Role')
-						));
-				}
+					echo $this->Form->select('Rol', array($roles), 
+	                array('class' => 'form-control', 'empty' => 'Seleccione el rol'));
+				} ?>
+
+				<br>
+
+				<?php
 
 				if (!empty($sites)) {
 					echo $this->Form->input('Site', array(
@@ -42,7 +45,7 @@
 				}
 			?>
 		</fieldset>
-	<?php echo $this->Form->button('Submit', array('class'=>'btn btn-success')); ?>		
-	<?php echo $this->Html->link(__('Cancel'), array('action'=>'index'), array('class'=>'btn btn-default') ); ?>
+	<?php echo $this->Form->button('Actualizar', array('class'=>'btn btn-primary')); ?>		
+	<?php echo $this->Html->link(__('Cancelar'), array('action'=>'index'), array('class'=>'btn btn-default') ); ?>
 	<?php echo $this->Form->end(); ?>
 </div>
