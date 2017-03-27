@@ -48,9 +48,10 @@ class SiteUsersController extends UsersAppController {
             	'User.id !=' => $user_id,
             	'is_admin' => 0,
             	),
-			'recursive' => 1,			
+			'recursive' => 1,
+			'limit' => 10,			
 		);
-
+   
         $this->Paginator->settings[$this->modelClass]['conditions'] = $parsedConditions;
 		$this->set('users', $this->Paginator->paginate());
 		$this->set(compact('site_alias'));		
@@ -197,7 +198,6 @@ class SiteUsersController extends UsersAppController {
 					if($rol_id == null) {
 					$rol_id = $this->request->data['Rol']['Rol'][0];
 				    }
-				    debug($rol_id); die; 
 
 					$this->{$this->modelClass}->hasAndBelongsToMany['Rol']['unique'] = false;
 					if ( $this->{$this->modelClass}->addRoleIntoSite($rol_id, $user_id) ) {

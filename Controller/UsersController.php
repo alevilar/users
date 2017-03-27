@@ -311,6 +311,7 @@ class UsersController extends UsersAppController {
 
 		$this->Paginator->settings[$this->modelClass] = array(
 			'recursive' => $recursive,
+			'limit' => 10,
 		);
 
 

@@ -32,11 +32,11 @@
 	</div>
 	<table class="table">
 		<tr>
-			<th><?php echo $this->Paginator->sort('Nombre de usuario'); ?></th>
-			<th><?php echo $this->Paginator->sort('E-Mail'); ?></th>
-		<?php if (empty($adminPanel)) { ?>	<th><?php echo $this->Paginator->sort('Rol'); ?></th> <?php } ?>
-			<th><?php echo $this->Paginator->sort('Activo'); ?></th>
-			<th><?php echo $this->Paginator->sort('Ultima vez conectado'); ?></th>
+			<th><?php echo $this->Paginator->sort('username','Nombre de usuario'); ?></th>
+			<th><?php echo $this->Paginator->sort('email', 'E-Mail'); ?></th>
+		<?php if (empty($adminPanel)) { ?>	<th><?php echo __('Rol'); ?></th> <?php } ?>
+			<th><?php echo $this->Paginator->sort('active','Activo'); ?></th>
+			<th><?php echo $this->Paginator->sort('last_login','Ultima vez conectado'); ?></th>
 			<th class="actions"><?php echo __d('users', 'Acciones'); ?></th>
 		</tr>
 			<?php
