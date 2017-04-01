@@ -304,10 +304,15 @@ class UsersController extends UsersAppController {
 		}
 
 		$this->Paginator->settings[$this->modelClass] = array(
+<<<<<<< HEAD
 			'recursive' => 1,
 			'order' => array('User.last_login' => 'desc'),
 			'conditions' => $parsedConditions,
 			'limit' => 50,
+=======
+			'recursive' => $recursive,
+			'limit' => 10,
+>>>>>>> 5afd2552664df7f5573114b8aaca250e2167f5c8
 		);
 
 		$this->set('users', $this->Paginator->paginate($this->modelClass));
