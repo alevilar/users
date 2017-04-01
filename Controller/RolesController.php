@@ -94,4 +94,28 @@ class RolesController extends UsersAppController {
 		$this->Session->setFlash(__('Rol was not deleted'),'Risto.flash_error');
 		$this->redirect(array('action' => 'index'));
 	}
+
+
+	public function edit_for_user( $userId ) {
+		$this->Rol->User->id = $userId;
+		if (!$this->Rol->User->exists()) {
+			throw new NotFoundException(__('Invalid User'));
+		}
+
+		if ($this->request->is('post') || $this->request->is('put')) {
+			debug($this->request->data);
+			if ($this->Rol->User->save($this->request->data, array('fieldList'=> array('id')))) {
+				$this->Session->setFlash(__('The rol has been saved'),'Risto.flash_success');
+				$this->redirect($this->referer());
+			} else {
+				debug($this->Rol->User->validationErrors);
+				$this->Session->setFlash(__('The rol could not be saved. Please, try again.'),'Risto.flash_error');
+			}
+		} else {
+			$this->Rol->User->contain(array('Rol'));
+			$user = $this->Rol->User->read();
+			$this->request->data = $user;
+		}
+		$this->set('roles', $this->Rol->find("list"));
+	}
 }

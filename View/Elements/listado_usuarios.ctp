@@ -1,42 +1,30 @@
-<div class="btn-group pull-right">
-	<?php echo $this->Html->link(__('Crear nuevo %s', __('Usuario')), array('admin'=>true,'plugin'>'users', 'controller'=> 'SiteUsers', 'action'=>'add'), array('class'=>'btn btn-success btn-lg btn-add')); ?>	
-	</div>
+<?php
+if (empty($modelName)) {
+	$modelName = $model;
+}
 
-	<h2><?php echo __d('users', 'Users'); ?></h2>
-<br>
-	<?php
-		if (CakePlugin::loaded('Search')) {
-		?>
-		<div class="row">               
-		<?php
-		if(empty($adminPanel)) {
-			$controlador = 'SiteUsers';
-		} else {
-			$controlador = 'users';
-		}
-		echo $this->Form->create('User', array('url' => array('controller' => $controlador,'action' => 'index')));
-		?>		
-        <div class="col-xs-6 col-sm-6 col-md-6">                
-		<?php echo $this->Form->input('txt_search', array('label' => false, 'placeholder' => 'Escribe aquí datos del usuario buscado para realizar una busqueda.'));?>
-        </div>
-        <div class="col-xs-6 col-sm-6 col-md-6">               
-        <?php echo $this->Form->submit('Buscar', array('class' => 'btn btn-default'));?>
-        </div>      
-		<?php echo $this->Form->end();?>
-		</div>
-	<?php
-		}
-	?>
-    <div class="center">
+if ( !isset($adminPanel) ) {
+	$adminPanel = false;
+}
+
+?>
+
+
+	<div class="center">
 	<?php echo $this->element('Users.paging'); ?>
 	</div>
 	<table class="table">
 		<tr>
-			<th><?php echo $this->Paginator->sort('Nombre de usuario'); ?></th>
-			<th><?php echo $this->Paginator->sort('E-Mail'); ?></th>
-		<?php if (empty($adminPanel)) { ?>	<th><?php echo $this->Paginator->sort('Rol'); ?></th> <?php } ?>
-			<th><?php echo $this->Paginator->sort('Activo'); ?></th>
-			<th><?php echo $this->Paginator->sort('Ultima vez conectado'); ?></th>
+			<th><?php echo $this->Paginator->sort('username','Nombre de usuario'); ?></th>
+
+			<?php if ( $adminPanel ) { ?>
+				<th><?php echo $this->Paginator->sort('email','E-Mail'); ?></th>
+			<?php } ?>
+			<th>Sitios</th>
+			<th>Roles</th>
+			<th><?php echo $this->Paginator->sort('active','Activo'); ?></th>
+			<th><?php echo $this->Paginator->sort('created','en PaxaPos desde'); ?></th>
+			<th><?php echo $this->Paginator->sort('last_login','Ultima vez conectado'); ?></th>
 			<th class="actions"><?php echo __d('users', 'Acciones'); ?></th>
 		</tr>
 			<?php
@@ -50,16 +38,29 @@
 			?>
 			<tr<?php echo $class;?>>
 				<td>
-					<?php echo $user[$model]['username']; ?>
-				</td>
-				<td>
-					<spam class="email-verified"><?php echo $user[$model]['email_verified'] == 1 ? "✓" : "✕"; ?></spam>
-					<?php echo $user[$model]['email']; ?>
+					<?php echo $user[$modelName]['username']; ?>
 				</td>
 
+				<?php if ( $adminPanel ) { ?>
+				<td>
+					<spam class="email-verified"><?php echo $user[$modelName]['email_verified'] == 1 ? "✓" : "✕"; ?></spam>
+					<?php echo $user[$modelName]['email']; ?>
+				</td>
+				<?php } ?>
+
+
+				<td>
 				<?php
-				if (empty($adminPanel)) {
+					if (array_key_exists('Site', $user)) {
+						$sites = '';
+						foreach ($user['Site'] as $site ) {
+							$sites .= "- ".$this->Html->link( $site['name'], array('tenant' => $site['alias'], 'plugin'=>'risto', 'controller' => 'pages', 'action' => 'display','dashboard') )."<br>";
+						} 
+						echo trim( $sites, "," );
+					}
 				?>
+				</td>
+
 				<td>
 				<?php
 					$roles = '';
@@ -71,82 +72,71 @@
 					}
 				?>
 				</td>
-				<?php
-				  }
-				?>
 
 				<td>
-					<?php echo $user[$model]['active'] == 1 ? __d('users', 'Yes') : __d('users', 'No'); ?>
+					<?php echo $user[$modelName]['active'] == 1 ? __d('users', 'Yes') : __d('users', 'No'); ?>
 				</td>
+
+				<td>
+					<?php echo $this->Time->niceShort( $user[$modelName]['created'] ); ?>
+				</td>
+
+
 				<td>
 					<?php 
-					echo $user[$model]['last_login'] ?
-							$this->Time->nice( $user[$model]['last_login'])
+					echo $user[$modelName]['last_login'] ?
+							$this->Time->niceShort( $user[$modelName]['last_login'])
 							: __d('users','Nunca'); 
 					?>
 				</td>
 				<td class="actions">
 
-                <div class="btn-group">
-                  <?php echo $this->Html->link(__('Editar'), array('action'=>'edit', $user[$model]['id']), array('class'=>'btn btn-default btn-sm btn-edit')); ?>
+				<div class="btn-group">
 
-                  <button type="button" class="btn btn-default  btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="caret"></span>
-                    <span class="sr-only">Toggle Dropdown</span>
-                  </button>
-                  <ul class="dropdown-menu">
-                  <?php
+				<?php if ( $adminPanel ) { ?>
+					  <?php echo $this->Html->link(__('Editar'), array('plugin'=>'users', 'action'=>'edit', $user[$modelName]['id']), array('class'=>'btn btn-default btn-sm btn-edit')); ?>
 
-                  if (empty($userPanel)) {
-                   	$controlador = 'users';
-                   	$accion = 'delete';
-                   	$buttonName = 'Borrar Usuario';
-                   	$mensaje = '¿Estas seguro que quieres borrar a %s de PaxaPos?';
-                   } else {
-                   	$controlador = 'SiteUsers';
-                   	$accion = 'delete_from_tenant';
-                   	$buttonName = 'Quitar del comercio';
-                   	$mensaje = '¿Estas seguro que quieres desvincular a %s de tu comercio?';
-                   }
-                  ?>
-                  <li class="">
-                  <?php
-                  echo $this->Html->Link(__d('users', 'Añadir a otro comercio'), 
-                  array('controller' => 'SiteUsers', 'action' => 'assign_other_site', $user[$model]['id']), 
-                  array('class' => 'btn-add')); 
+					  <button type="button" class="btn btn-default  btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					  </button>
+					  <ul class="dropdown-menu">
+					  
 
-                  if (empty($adminPanel)) {
-                  $siteOffset = 0;
-                  $userOnSite = 0;
-                  
+					  <li class="">
+					  <?php
+					  echo $this->Html->Link(__d('users', 'Añadir a otro comercio'), 
+					  							array('plugin'=>'mt_sites','controller' => 'SiteUsers', 'action' => 'assign_other_site', $user[$modelName]['id']), 
+					  							array('class' => 'btn-add')); 
 
-                  	while(!empty($users[$userOffset]['Site'][$siteOffset])) { //si el indice no esta vacio...
-                  	 if ($users[$userOffset]['Site'][$siteOffset]['alias'] == $site_alias) {
-                       $userOnSite = $userOnSite + 1; /*se comprueba que el alias sea igual al alias del tenant actual
-                                                      Si es igual, se suma uno.*/
-                     }
-                     $siteOffset = $siteOffset + 1;
-                   }
-                   $userOffset = $userOffset + 1;
+					  echo $this->Html->link(__('Editar Roles'),
+					  					array('plugin'=>'users','controller'=>'roles', 'action'=>'edit_for_user', $user[$modelName]['id']),
+					  					array('class' => 'btn-edit') 
+					  	);
 
-                   if($userOnSite >= 1) { //Si es igual o mayor a uno, muestra el botón de quitar del comercio.
-                    echo $this->Form->postLink(__d('users', $buttonName), 
-                  	array('controller' => $controlador, 'action' => $accion, $user[$model]['id']), null, 
-                  	sprintf(__d('users', $mensaje), $user[$model]['username']));
-                       } else { //Sino, muestra el de agregar.
-                  ?>
-                   <?php 
-                    echo $this->Html->Link(__d('users', 'Añadir al comercio actual'), 
-                   	array('controller' => 'SiteUsers', 'action' => 'add_existing', $user[$model]['id']), 
-                   	array('class' => 'btn-add')); 
-                      }
-                  } else { //Si $adminPanel esta vacio, muestra el botón de borrar usuario del sistema.         
-                   echo $this->Form->postLink(__d('users', $buttonName), array('controller' => $controlador, 'action' => $accion, $user[$model]['id']), null, sprintf(__d('users', $mensaje), $user[$model]['username']));
-                  }
-                   ?>
-                  </li>
-                  </ul>
-                </div>
+
+					  echo $this->Form->postLink(__d('users', "Borrar"), array('plugin'=>'users', 'controller' => 'users', 'action' => 'delete' , $user[$modelName]['id']), null, sprintf(__d('users', "Está por eliminar al usuario \"%s\". ¿Seguro desea borrarlo definiticamente?", $user[$modelName]['username'])));
+					   ?>
+					  </li>
+					  </ul>
+					  <?php } else { ?>
+
+					  	<div class="btn-group">
+
+						  	<?php  echo $this->Html->link(__('Editar Roles'),
+						  					array('plugin'=>'users','controller'=>'roles', 'action'=>'edit_for_user', $user[$modelName]['id']),
+						  					array('class' => 'btn  btn-sm  btn-primary btn-edit') 
+						  	);
+						  	?>
+
+						  	<?php  echo $this->Form->postLink(__('Desvincular del Comercio'),
+						  					array('plugin'=>'mt_sites','controller'=>'site_users', 'action'=>'delete_from_tenant', $user[$modelName]['id']),
+						  					array('class' => 'btn btn-sm btn-success')
+						  	);
+						  	?>
+						</div>
+					  <?php } ?>
+				</div>
 					
 					
 				</td>

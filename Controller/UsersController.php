@@ -288,35 +288,102 @@ class UsersController extends UsersAppController {
  * @return void
  */
 	public function index() {
-		if ( !MtSites::isTenant()) {
-        	throw new ForbiddenException( __("El Tenant no es válido o no fue encontrado en el sistema"));
-        }
-
-
+		
 		if ($this->{$this->modelClass}->Behaviors->loaded('Searchable')) {
 			$this->Prg->commonProcess();
-			unset($this->{$this->modelClass}->validate['username']);
-			unset($this->{$this->modelClass}->validate['email']);
+			// unset($this->{$this->modelClass}->validate['username']);
+			// unset($this->{$this->modelClass}->validate['email']);
 			$this->{$this->modelClass}->data[$this->modelClass] = $this->passedArgs;
 		}
 		
-		$recursive = 0;	
 
 		if ($this->{$this->modelClass}->Behaviors->loaded('Searchable')) {
 			$parsedConditions = $this->{$this->modelClass}->parseCriteria($this->passedArgs);
 		} else {
 			$parsedConditions = array();
 		}
-		$this->_setupAdminPagination();
 
 		$this->Paginator->settings[$this->modelClass] = array(
-			'recursive' => $recursive,
+			'recursive' => 1,
+			'order' => array('User.last_login' => 'desc'),
+			'conditions' => $parsedConditions,
+			'limit' => 50,
 		);
 
-
-		$this->Paginator->settings[$this->modelClass]['conditions'] = $parsedConditions;
-		$this->set('users', $this->Paginator->paginate());
+		$this->set('users', $this->Paginator->paginate($this->modelClass));
 	}
+
+
+
+/**
+ * Admin Index
+ *
+ * @return void
+ */
+	public function index_for_tenant() {
+
+		if ( !MtSites::isTenant() ) {
+			throw new CakeException("No se encuentra en un Tenant");
+		}
+
+
+		if ($this->User->Behaviors->loaded('Searchable')) {
+			$this->Prg->commonProcess();
+		}
+		
+
+		$parsedConditions = $this->User->parseCriteria($this->passedArgs);
+
+		$site_alias = MtSites::getSiteName();
+		$site = $this->User->Site->findByAlias($site_alias);
+
+		$user_id = Cakesession::read('Auth.User.id');
+
+		if ( empty($parsedConditions)) {
+
+		
+			$usersIds = $this->User->SiteUser->find('list', array(
+			'fields' => array(
+				'SiteUser.user_id', 'SiteUser.user_id'
+				),
+			'conditions' => array(
+            	'SiteUser.user_id !=' => $user_id,
+            	'SiteUser.site_id' => $site['Site']['id'],
+				)
+			));
+
+			$parsedConditions = array(
+            	'User.id' => $usersIds,
+            	);
+			$esBusquedaGeneral = false;
+		} else {
+
+			$esBusquedaGeneral = true;
+		}
+
+
+
+
+		$this->Paginator->settings['User'] = array(
+            'conditions' => $parsedConditions,
+			'contain' => array(
+				'Rol',
+				'Site'
+			)
+		);
+
+		$this->set('busqueda_general_realizada', $esBusquedaGeneral);
+		$this->set('users', $this->Paginator->paginate('User'));
+		$this->set('modelName', "User");
+		if ( $esBusquedaGeneral ) {
+			$this->set('title', 'Usuarios no vinculados con mi comercio');
+		} else {
+			$this->set('title', 'Usuarios vinculados');
+		}
+		$this->set(compact('site_alias'));		
+	}
+
+
 
 
 
