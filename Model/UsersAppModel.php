@@ -9,7 +9,7 @@
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-App::uses('AppModel', 'Model');
+App::uses('RistoSoftDeleteTenantAppModel', 'Risto.Model');
 
 /**
  * Users App Model
@@ -17,7 +17,7 @@ App::uses('AppModel', 'Model');
  * @package users
  * @subpackage users.models
  */
-class UsersAppModel extends AppModel {
+class UsersAppModel extends RistoSoftDeleteTenantAppModel {
 
 /**
  * Plugin name

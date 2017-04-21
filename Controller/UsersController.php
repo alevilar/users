@@ -337,8 +337,6 @@ class UsersController extends UsersAppController {
 		$site_alias = MtSites::getSiteName();
 		$site = $this->User->Site->findByAlias($site_alias);
 
-		$user_id = Cakesession::read('Auth.User.id');
-
 		if ( empty($parsedConditions)) {
 
 		
@@ -347,7 +345,6 @@ class UsersController extends UsersAppController {
 				'SiteUser.user_id', 'SiteUser.user_id'
 				),
 			'conditions' => array(
-            	'SiteUser.user_id !=' => $user_id,
             	'SiteUser.site_id' => $site['Site']['id'],
 				)
 			));
