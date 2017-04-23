@@ -17,7 +17,7 @@ App::uses('RistoSoftDeleteTenantAppModel', 'Risto.Model');
  * @package users
  * @subpackage users.models
  */
-class UsersAppModel extends RistoSoftDeleteTenantAppModel {
+class UsersAppModel extends AppModel {
 
 /**
  * Plugin name
@@ -39,8 +39,24 @@ class UsersAppModel extends RistoSoftDeleteTenantAppModel {
  * @var array
  */
 	public $actsAs = array(
-		'Containable'
+		'Containable',
+		'Search.Searchable',
+		'Utils.SoftDelete',
 	);
+
+
+	
+
+
+	public function delete($id = null, $cascade = true) {
+	    $result = parent::delete($id, $cascade);
+	    if ($result === false && $this->Behaviors->enabled('SoftDelete')) {
+	    	$this->_deleteDependent($id, $cascade);
+	       return (bool)$this->field('deleted', array('deleted' => 1));
+	    }
+	    return $result;
+	}
+
 
 /**
  * Customized paginateCount method

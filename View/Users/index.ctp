@@ -14,10 +14,12 @@ $this->element("Risto.layout_modal_edit");
 
 	
 
-	<h2><?php echo __d('users', 'Users'); ?></h2>
+	<h2><?php echo $title; ?></h2>
 	<br>
 
 	<?php
+		
+
 		if (CakePlugin::loaded('Search')) {
 		?>
 		<div class="row">               
@@ -25,12 +27,23 @@ $this->element("Risto.layout_modal_edit");
 		
 		echo $this->Form->create('User');
 		?>		
-		<div class="col-xs-6 col-sm-6 col-md-6">                
+		<div class="col-sm-6 col-xs-6">                
 		<?php echo $this->Form->input('txt_search', array('label' => false, 'placeholder' => 'Escribe aquí datos del usuario buscado para realizar una busqueda.'));?>
 		</div>
-		<div class="col-xs-6 col-sm-6 col-md-6">               
-		<?php echo $this->Form->submit('Buscar usuario PaxaPos', array('class' => 'btn btn-default'));?>
+		<div class="col-sm-2 col-xs-3">               
+		<?php echo $this->Form->submit('Buscar', array('class' => 'btn  btn-block btn-primary'));?>
 		</div>      
+
+		<div class="col-sm-3 col-sm-offset-1 col-xs-3"> 
+
+		<?php 
+		if ($this->action == 'index_deleted') {
+			echo $this->Html->link('Ver Listado de Usuarios', array('action'=>'index'), array('class'=>'btn btn-default btn-block'));
+		} else {
+			echo $this->Html->link('Ver Usuarios Borrados', array('action'=>'index_deleted'), array('class'=>'btn btn-default btn-block'));
+		}
+ 		?>
+		</div>
 		<?php echo $this->Form->end();?>
 		</div>
 	<?php

@@ -282,6 +282,35 @@ class UsersController extends UsersAppController {
         $this->set("socialProfiles", $socialProfiles);
 	}
 
+
+	public function index_deleted() {
+		$this->Paginator->settings[$this->modelClass] = array(
+			'recursive' => 1,
+			'order' => array('User.deleted_date' => 'desc'),
+			'conditions' => array(
+				'User.deleted' => 1,
+				),
+			'limit' => 50,
+		);
+
+		$this->set('users', $this->Paginator->paginate($this->modelClass));
+		$this->set('title', "Usuarios Borrados");
+		$this->render('index');
+	}
+
+	public function restaurar($id){
+		if (!$this->User->exists($id) ){
+			throw new NotFoundException("El usuario no pudo ser encontrado");
+		}
+
+		$this->User->id = $id;
+		if ( !$this->User->saveField('deleted', 0) ) {
+			throw new CakeException("Error al restaurar Usuario");
+		}
+		$this->redirect($this->referer());
+	}
+
+
 /**
  * Admin Index
  *
@@ -309,7 +338,7 @@ class UsersController extends UsersAppController {
 			'conditions' => $parsedConditions,
 			'limit' => 50,
 		);
-
+		$this->set('title', "Usuarios");
 		$this->set('users', $this->Paginator->paginate($this->modelClass));
 	}
 

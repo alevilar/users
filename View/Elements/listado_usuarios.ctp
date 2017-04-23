@@ -114,8 +114,11 @@ if ( !isset($adminPanel) ) {
 					  					array('class' => 'btn-edit') 
 					  	);
 
-
-					  echo $this->Form->postLink(__d('users', "Borrar"), array('plugin'=>'users', 'controller' => 'users', 'action' => 'delete' , $user[$modelName]['id']), null, sprintf(__d('users', "Está por eliminar al usuario \"%s\". ¿Seguro desea borrarlo definiticamente?", $user[$modelName]['username'])));
+					  if ( !$user[$modelName]['deleted'] ) {
+					  	echo $this->Form->postLink(__d('users', "Borrar"), array('plugin'=>'users', 'controller' => 'users', 'action' => 'delete' , $user[$modelName]['id']), null, sprintf(__d('users', "Está por eliminar al usuario \"%s\". ¿Seguro desea borrarlo definiticamente?", $user[$modelName]['username'])));
+					  } else {
+					  	echo $this->Html->link(__d('users', "Restaurar"), array('plugin'=>'users', 'controller' => 'users', 'action' => 'restaurar', $user[$modelName]['id']));
+					  }
 					   ?>
 					  </li>
 					  </ul>
