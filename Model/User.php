@@ -107,7 +107,20 @@ class User extends UsersAppModel {
 			'limit' => '',
 			'offset' => '',
 			'finderQuery' => '',
-		)
+		),
+		'SuperRol' => array(
+			'className' => 'Users.SuperRol',
+			'joinTable' => 'super_roles_users',
+			'foreignKey' => 'user_id',
+			'associationForeignKey' => 'rol_id',
+			'unique' => 'keepExisting',
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+		),
 	);
 
 
