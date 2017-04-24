@@ -42,7 +42,3 @@
 		text-align: center !important;
 	}
 </style>
-
-<script type="text/javascript">
-
-</script>
