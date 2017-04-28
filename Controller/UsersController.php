@@ -333,7 +333,7 @@ class UsersController extends UsersAppController {
 		}
 
 		$this->Paginator->settings[$this->modelClass] = array(
-			'recursive' => 1,
+			'contain' => array('SuperRol'),
 			'order' => array('User.last_login' => 'desc'),
 			'conditions' => $parsedConditions,
 			'limit' => 50,
@@ -393,8 +393,8 @@ class UsersController extends UsersAppController {
 		$this->Paginator->settings['User'] = array(
             'conditions' => $parsedConditions,
 			'contain' => array(
-				'Rol',
-				'Site'
+				'Site',
+				'Rol'
 			)
 		);
 
@@ -905,14 +905,8 @@ class UsersController extends UsersAppController {
 		$ret = parent::isAuthorized($user);
 		if ( $this->action == 'index') {
 
-		    if( !array_key_exists('is_admin', $user) ){
+		    if( !userIsAdmin($user) ){
 		           $ret =  false;
-		    }
-
-
-		    //si es admin general esta autorizado
-		    if( empty($user['is_admin']) ) {		
-		            $ret =  false;
 		    }
 		}
 

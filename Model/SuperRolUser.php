@@ -5,7 +5,7 @@ App::uses('RistoDualTenantAppModel', 'Risto.Model');
  *
  * @property User $User
  */
-class SuperRolUser extends RistoDualTenantAppModel {
+class SuperRolUser extends RistoAppModel {
 
 	//public $useTable = 'roles_users';
 

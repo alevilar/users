@@ -107,6 +107,7 @@ class User extends UsersAppModel {
 			'limit' => '',
 			'offset' => '',
 			'finderQuery' => '',
+			'with' => 'Users.RolUser'
 		),
 		'SuperRol' => array(
 			'className' => 'Users.SuperRol',
@@ -589,7 +590,7 @@ class User extends UsersAppModel {
     public function findById($users) {
 
     	$usernames[] = array($this->find('list',array(
-    		'conditions' => array('id' => $users, 'is_admin' => 0)))); 
+    		'conditions' => array('id' => $users)))); 
        
        return $usernames;
     } 

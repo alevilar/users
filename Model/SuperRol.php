@@ -5,7 +5,7 @@ App::uses('RistoDualTenantAppModel', 'Risto.Model');
  *
  * @property User $User
  */
-class SuperRol extends RistoDualTenantAppModel {
+class SuperRol extends RistoAppModel {
 /**
  * Display field
  *

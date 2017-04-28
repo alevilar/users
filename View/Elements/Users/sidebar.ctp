@@ -10,7 +10,7 @@
 			<li><?php echo $this->Html->link(__d('users', 'My Account'), array('plugin' => 'users', 'controller' => 'users', 'action' => 'edit')); ?>
 			<li><?php echo $this->Html->link(__d('users', 'Change password'), array('plugin' => 'users', 'controller' => 'users', 'action' => 'change_password')); ?>
 		<?php endif ?>
-		<?php if($this->Session->read('Auth.User.is_admin')) : ?>
+		<?php if( userIsAdmin() ) : ?>
 			<li>&nbsp;</li>
 			<li><?php echo $this->Html->link(__d('users', 'List Users'), array('plugin' => 'users', 'controller' => 'users', 'action' => 'index'));?></li>
 		<?php endif; ?>

@@ -1,11 +1,11 @@
 <?php
-App::uses('RistoDualTenantAppModel', 'Risto.Model');
+App::uses('RistoTenantAppModel', 'Risto.Model');
 /**
  * Rol Model
  *
  * @property User $User
  */
-class Rol extends RistoDualTenantAppModel {
+class Rol extends RistoTenantAppModel {
 /**
  * Display field
  *
@@ -15,7 +15,7 @@ class Rol extends RistoDualTenantAppModel {
         
 
 
-	public $inTenantHasOne = array('Users.GenericUser');
+	public $hasOne = array('Users.GenericUser');
 
 
 	/**
@@ -36,6 +36,7 @@ class Rol extends RistoDualTenantAppModel {
 			'limit' => '',
 			'offset' => '',
 			'finderQuery' => '',
+			'with' => 'Users.RolUser'
 		)
 	);
 
