@@ -103,7 +103,6 @@ class RolesController extends UsersAppController {
 		}
 
 		if ($this->request->is('post') || $this->request->is('put')) {
-			debug($this->request->data);
 			if ($this->Rol->User->save($this->request->data, array('fieldList'=> array('id')))) {
 				$this->Session->setFlash(__('The rol has been saved'),'Risto.flash_success');
 				$this->redirect($this->referer());
