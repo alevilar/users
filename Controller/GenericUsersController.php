@@ -23,7 +23,7 @@ class GenericUsersController extends UsersAppController {
 					'GenericUser'
 				),
 			'conditions' => array(
-				'machin_name !=' => 'duenio'
+				'machin_name !=' => ROL_DUENIO
 				)
 			));
 		$this->set('genericUsers', $this->Paginator->paginate());

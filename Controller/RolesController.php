@@ -97,13 +97,10 @@ class RolesController extends UsersAppController {
 
 
 	public function edit_for_user( $userId ) {
-        $user = $this->Rol->User->findById($userId);
         $this->Rol->User->id = $userId;
-
-		if (empty($user[0][0]) || !isset($user[0][0])) {
-			$this->Session->setFlash(__('Error: El usuario no existe.'),'Risto.flash_error');
-			$this->redirect($this->referer());			
-		}
+ 		if (!$this->Rol->User->exists()) {
+ 		  throw new NotFoundException(__('Invalid User'));
+ 		}
          
 		if ($this->request->is('post') || $this->request->is('put')) {
 			if ($this->Rol->RolUser->asignarRol($this->request->data)) {
