@@ -121,6 +121,7 @@ class User extends UsersAppModel {
 			'limit' => '',
 			'offset' => '',
 			'finderQuery' => '',
+			'with' => 'Users.SuperRolUser'
 		),
 	);
 
