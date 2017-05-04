@@ -67,6 +67,11 @@ if ( !isset($adminPanel) ) {
 					if (array_key_exists('Rol', $user)) {
 						foreach ($user['Rol'] as $rol ) {
 							$roles .= ", " .$rol['name'];
+						}
+						echo trim($roles, ',');
+					} else if (array_key_exists('SuperRol', $user)) {
+						foreach ($user['SuperRol'] as $rol ) {
+							$roles .= ", " .$rol['name'];
 						} 
 						echo trim($roles, ',');
 					}
@@ -110,12 +115,12 @@ if ( !isset($adminPanel) ) {
 					  							array('class' => 'btn-add')); 
 
 					  echo $this->Html->link(__('Editar Roles'),
-					  					array('plugin'=>'users','controller'=>'roles', 'action'=>'edit_for_user', $user[$modelName]['id']),
+					  					array('plugin'=>'users','controller'=>'superRoles', 'action'=>'edit_for_user', $user[$modelName]['id']),
 					  					array('class' => 'btn-edit') 
 					  	);
 
 					  if ( !$user[$modelName]['deleted'] ) {
-					  	echo $this->Form->postLink(__d('users', "Borrar"), array('plugin'=>'users', 'controller' => 'users', 'action' => 'delete' , $user[$modelName]['id']), null, sprintf(__d('users', "Está por eliminar al usuario \"%s\". ¿Seguro desea borrarlo definiticamente?", $user[$modelName]['username'])));
+					  	echo $this->Form->postLink(__d('users', "Borrar"), array('plugin'=>'users', 'controller' => 'users', 'action' => 'delete' , $user[$modelName]['id']), null, sprintf(__d('users', "Está por eliminar al usuario \"%s\". ¿Seguro desea borrarlo?", $user[$modelName]['username'])));
 					  } else {
 					  	echo $this->Html->link(__d('users', "Restaurar"), array('plugin'=>'users', 'controller' => 'users', 'action' => 'restaurar', $user[$modelName]['id']));
 					  }

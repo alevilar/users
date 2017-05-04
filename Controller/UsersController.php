@@ -54,6 +54,7 @@ class UsersController extends UsersAppController {
 	);
 
 
+
 /**
  * Preset vars
  *
@@ -285,7 +286,7 @@ class UsersController extends UsersAppController {
 
 	public function index_deleted() {
 		$this->Paginator->settings[$this->modelClass] = array(
-			'recursive' => 1,
+			'contain' => array('SuperRol', 'Site'),
 			'order' => array('User.deleted_date' => 'desc'),
 			'conditions' => array(
 				'User.deleted' => 1,
@@ -333,7 +334,7 @@ class UsersController extends UsersAppController {
 		}
 
 		$this->Paginator->settings[$this->modelClass] = array(
-			'contain' => array('SuperRol'),
+			'contain' => array('SuperRol', 'Site'),
 			'order' => array('User.last_login' => 'desc'),
 			'conditions' => $parsedConditions,
 			'limit' => 50,

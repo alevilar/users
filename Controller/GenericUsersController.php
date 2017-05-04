@@ -21,6 +21,9 @@ class GenericUsersController extends UsersAppController {
 		$roles = $this->GenericUser->Rol->find('all', array(
 			'contain' => array(
 					'GenericUser'
+				),
+			'conditions' => array(
+				'machin_name !=' => ROL_DUENIO
 				)
 			));
 		$this->set('genericUsers', $this->Paginator->paginate());
