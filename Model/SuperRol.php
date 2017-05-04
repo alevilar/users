@@ -31,6 +31,7 @@ class SuperRol extends RistoAppModel {
 			'limit' => '',
 			'offset' => '',
 			'finderQuery' => '',
+			'with' => 'Users.SuperRolUser'
 		)
 	);
 
