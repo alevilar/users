@@ -2,8 +2,10 @@
 /**
  * Rol Fixture
  */
-class RolFixture extends CakeTestFixture {
+class Rol201704Fixture extends CakeTestFixture {
 
+
+	public $table = 'roles';
 /**
  * Fields
  *
@@ -72,13 +74,13 @@ class RolFixture extends CakeTestFixture {
 		),
 		array(
 			'id' => '5',
-			'name' => 'Dueño',
-			'machin_name' => ROL_DUENIO,
+			'name' => 'Cocinero',
+			'machin_name' => ROL_MOZO,
 			'created' => '2017-04-07 20:27:39',
 			'modified' => '2017-04-07 20:27:39',
 			'created_by' => null,
 			'deleted_date' => null,
 			'deleted' => '0'
-		),
+		),		
 	);
 }
