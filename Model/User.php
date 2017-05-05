@@ -662,7 +662,7 @@ class User extends UsersAppModel {
 
 		$defaults = array(
 			'emailVerification' => true,
-			'removeExpiredRegistrations' => true,
+			'removeExpiredRegistrations' => false,
 			'returnData' => true);
 		extract(array_merge($defaults, $options));
 
