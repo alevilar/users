@@ -485,7 +485,17 @@ class User extends UsersAppModel {
 		$this->validate = $this->validatePasswordChange;
 
 		$this->set($postData);
-		if ($this->validates()) {
+		$this->validates(); //tuve que hacer pequeñas modificaciones, lee el issue #117 para saber el porque.
+		
+		$erroresValidaciones = $this->validationErrors;
+
+        if(empty($erroresValidaciones)) {
+	       $allOK = true; //si no hay errores pasa por acá
+        } else {
+        	$allOK = false; //sino acá
+        }
+
+		if ($allOK) { //si es true hace esto
 			$this->data[$this->alias]['password'] = $this->hash($this->data[$this->alias]['new_password'], null, true);
 			$this->save($postData, array(
 				'validate' => false,
