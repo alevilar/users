@@ -1,12 +1,12 @@
 <?php
-App::uses('UsersAppModel', 'Users.Model');
+App::uses('RistoAppModel', 'Risto.Model');
 
 /**
  * Rol Model
  *
  * @property User $User
  */
-class SocialProfile extends UsersAppModel {
+class SocialProfile extends RistoAppModel {
 
 /**
  *

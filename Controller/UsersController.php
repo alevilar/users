@@ -308,6 +308,7 @@ class UsersController extends UsersAppController {
 		if ( !$this->User->saveField('deleted', 0) ) {
 			throw new CakeException("Error al restaurar Usuario");
 		}
+
 		$this->redirect($this->referer());
 	}
 
@@ -433,12 +434,12 @@ class UsersController extends UsersAppController {
 		}
 
 		if (empty($this->request->data)) {
-			$this->{$this->modelClass}->recursive = 1;
+			$this->{$this->modelClass}->recursive = -1;
 			$this->request->data = $this->{$this->modelClass}->read(null, $userId);
 			unset($this->request->data[$this->modelClass]['password']);
 		}
-
-		$roles = $this->{$this->modelClass}->Rol->find('list');
+		$roles = array();
+		//$roles = $this->{$this->modelClass}->Rol->find('list');
 		$this->set(compact( 'roles'));
 		$this->render('admin_form');
 	}
@@ -452,14 +453,15 @@ class UsersController extends UsersAppController {
  * @param string $userId User ID
  * @return void
  */
-	public function delete($userId = null) {		
-		if ($this->{$this->modelClass}->delete($userId)) {
-			$this->Session->setFlash(__d('users', 'User deleted'));
-		} else {
-			$this->Session->setFlash(__d('users', 'Invalid User'));
+	public function delete($userId = null) {
+		if ( !$this->{$this->modelClass}->exists($userId) ){
+			throw new NotFoundException("El usuario no existe");
+			
 		}
-
-		$this->redirect(array('action' => 'index'));
+		if ($this->{$this->modelClass}->softDelete($userId)) {
+			$this->Session->setFlash(__d('users', 'User deleted'));
+		}
+		$this->redirect($this->referer());
 	}
 
 

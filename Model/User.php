@@ -225,6 +225,8 @@ class User extends UsersAppModel {
 
 	}
 
+
+
 /**
  * Setup available plugins
  *
@@ -1012,10 +1014,13 @@ class User extends UsersAppModel {
  * @return void
  */
 	protected function _removeExpiredRegistrations() {
+		// no queremos eliminar a los expirados
+		/*
 		$this->deleteAll(array(
 			$this->alias . '.email_verified' => 0,
 			$this->alias . '.email_token_expires <' => date('Y-m-d H:i:s'))
 		);
+		*/
 	}
 
 /**

@@ -9,7 +9,7 @@
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-App::uses('RistoSoftDeleteTenantAppModel', 'Risto.Model');
+App::uses('UsersAppModel', 'Risto.Model');
 
 /**
  * Users App Model
@@ -41,21 +41,10 @@ class UsersAppModel extends AppModel {
 	public $actsAs = array(
 		'Containable',
 		'Search.Searchable',
-		'Utils.SoftDelete',
+		'Risto.RistoSoftDelete',
 	);
 
 
-	
-
-
-	public function delete($id = null, $cascade = true) {
-	    $result = parent::delete($id, $cascade);
-	    if ($result === false && $this->Behaviors->enabled('SoftDelete')) {
-	    	$this->_deleteDependent($id, $cascade);
-	       return (bool)$this->field('deleted', array('deleted' => 1));
-	    }
-	    return $result;
-	}
 
 
 /**
