@@ -265,7 +265,7 @@ class UsersController extends UsersAppController {
 		}
 		$user = $this->Auth->user();
         if ( $this->request->is('post') || $this->request->is('put') ) {
-                if ($this->User->save( $this->request->data) ) {
+                if ($this->User->save( $this->request->data, false) ) {
                         $this->Session->setFlash(__('Se ha guardado la información correctamente'));
                         MtSites::loadSessionData();
                 } else {
@@ -713,6 +713,8 @@ class UsersController extends UsersAppController {
 				// we don't want to keep the cookie with the old password around
 				$this->RememberMe->destroyCookie();
 				$this->redirect('/');
+			} else {
+				$this->Session->setFlash(__d('users', 'Error changing the password, please try again.'), 'Risto.Flash/flash_error');
 			}
 		}
 	}
