@@ -1,5 +1,5 @@
 <?php
-App::uses('RistoDualTenantAppModel', 'Risto.Model');
+App::uses('RistoAppModel', 'Risto.Model');
 /**
  * Rol Model
  *
@@ -67,16 +67,6 @@ class SuperRol extends RistoAppModel {
 		),
 	);
 
-	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
-
-        
-        public function beforeSave($options = array()) {
-        	if (empty($this->data['Rol']['machin_name'])) {
-            	$this->data['Rol']['machin_name'] = strtolower( Inflector::slug( $this->data['Rol']['name'])) ;
-        	}
-            return true;
-        }
-        
 
 }
