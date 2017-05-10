@@ -265,7 +265,8 @@ class UsersController extends UsersAppController {
 		}
 		$user = $this->Auth->user();
         if ( $this->request->is('post') || $this->request->is('put') ) {
-                if ($this->User->save( $this->request->data, false) ) {
+        	$this->request->data['User']['tos'] = 1; 
+                if ($this->User->save( $this->request->data) ) {
                         $this->Session->setFlash(__('Se ha guardado la información correctamente'));
                         MtSites::loadSessionData();
                 } else {
