@@ -9,7 +9,7 @@
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-App::uses('UsersAppModel', 'Risto.Model');
+App::uses('AppModel', 'Risto.Model');
 
 /**
  * Users App Model
