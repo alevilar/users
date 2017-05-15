@@ -114,7 +114,6 @@ class GenericUsersController extends UsersAppController {
 		if (!$this->GenericUser->exists()) {
 			throw new NotFoundException(__('Invalid generic user'));
 		}
-		$this->request->allowMethod('post', 'delete');
 		if ($this->GenericUser->delete()) {
 			$this->Flash->success(__('The generic user has been deleted.'));
 		} else {
