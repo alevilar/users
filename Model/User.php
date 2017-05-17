@@ -974,6 +974,7 @@ class User extends UsersAppModel {
 		if (!empty($postData)) {
 			$this->set($postData);
 			if ($this->validates()) {
+				$this->data = array('User' => $this->data['User']);
 				if(isset($postData[$this->alias]['password'])) {
 					$this->data[$this->alias]['password'] = $this->hash($postData[$this->alias]['password'], 'sha1', true);
 				}
