@@ -19,6 +19,9 @@ class SuperRolUser extends RistoAppModel {
     public function asignarRol($data) {
     	$this->deleteAll(array('user_id' => $data['User']['id']), false);
     	$indice = 0;
+        if($data['SuperRol']['SuperRol'] == null) {
+            return true;
+        }
     	foreach($data['SuperRol']['SuperRol'] as $r) {
 
     	   $rolesUser[$indice] = array('user_id' => $data['User']['id'], 'rol_id' => $r);    	     	

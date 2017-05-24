@@ -19,6 +19,9 @@ class RolUser extends RistoTenantAppModel {
     public function asignarRol($data) {
     	$this->deleteAll(array('user_id' => $data['User']['id']), false);
     	$indice = 0;
+        if($data['Rol']['Rol'] == null) {
+            return true;
+        }
     	foreach($data['Rol']['Rol'] as $r) {
 
     	   $rolesUser[$indice] = array('user_id' => $data['User']['id'], 'rol_id' => $r);    	     	
