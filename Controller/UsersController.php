@@ -423,10 +423,9 @@ class UsersController extends UsersAppController {
  * @return void
  */
 	public function edit($userId = null) {
-
 		if ( $this->request->is('post')) {
-			unset ( $this->request->data[$this->modelClass]['last_login'] );
-			if ( $this->{$this->modelClass}->edit($userId, $this->request->data) ) {
+			unset ( $this->request->data[$this->modelClass]['last_login'] ); 
+			if ( $this->User->saveAll($this->request->data) ) {
 				$this->Session->setFlash(__d('users', 'User saved'));
 				$this->redirect(array('action' => 'index'));
 			} else {

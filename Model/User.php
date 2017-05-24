@@ -967,8 +967,10 @@ class User extends UsersAppModel {
  * @param array $postData controller post data usually $this->data
  * @throws NotFoundException
  * @return mixed True on successfully save else post data as array
- */
+ 
 	public function edit($userId = null, $postData = null) {
+		debug($this->data);
+		die;
 		$user = $this->getUserForEditing($userId);
 		$this->set($user);
 		if (!empty($postData)) {
@@ -988,7 +990,8 @@ class User extends UsersAppModel {
 			}
 		}
 	}
-
+*/
+	
 /**
  * Gets the user data that needs to be edited
  *
