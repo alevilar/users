@@ -19,8 +19,8 @@ if ( !isset($adminPanel) ) {
 
 			<?php if ( $adminPanel ) { ?>
 				<th><?php echo $this->Paginator->sort('email','E-Mail'); ?></th>
-			<?php } ?>
 			<th>Sitios</th>
+			<?php } ?>
 			<th>Roles</th>
 			<th><?php echo $this->Paginator->sort('active','Activo'); ?></th>
 			<th><?php echo $this->Paginator->sort('created','en PaxaPos desde'); ?></th>
@@ -51,13 +51,19 @@ if ( !isset($adminPanel) ) {
 
 				<td>
 				<?php
+				if ( $adminPanel ) {
 					if (array_key_exists('Site', $user)) {
 						$sites = '';
 						foreach ($user['Site'] as $site ) {
-							$sites .= "- ".$this->Html->link( $site['name'], array('tenant' => $site['alias'], 'plugin'=>'risto', 'controller' => 'pages', 'action' => 'display','dashboard') )."<br>";
+							$sites .= "- ".
+							$this->Html->link( $site['name'], array('tenant' => $site['alias'], 'plugin'=>'risto', 'controller' => 'pages', 'action' => 'display','dashboard') ).
+							$this->Html->link("<span class='glyphicon glyphicon-remove'></span>", 
+								array('plugin' => 'mt_sites', 'controller' => 'SiteUsers', 'action' => 'desvincular_del_site', $user['User']['id'], $site['alias']), array('escape' => false, 'class' => 'btn btn-sm'), sprintf(__('¿Seguro que quieres desvincular a '.$user['User']['username'].' del sitio '.$site['name'].'?')))
+							."<br>";
 						} 
 						echo trim( $sites, "," );
 					}
+				}
 				?>
 				</td>
 
