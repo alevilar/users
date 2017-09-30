@@ -57,7 +57,7 @@ if ( !isset($adminPanel) ) {
 						foreach ($user['Site'] as $site ) {
 							$sites .= "- ".
 							$this->Html->link( $site['name'], array('tenant' => $site['alias'], 'plugin'=>'risto', 'controller' => 'pages', 'action' => 'display','dashboard') ).
-							$this->Html->link("<span class='glyphicon glyphicon-remove'></span>", 
+							$this->Html->link("<span class='glyphicon glyphicon-remove text-danger'></span>", 
 								array('plugin' => 'mt_sites', 'controller' => 'SiteUsers', 'action' => 'desvincular_del_site', $user['User']['id'], $site['alias']), array('escape' => false, 'class' => 'btn btn-sm'), sprintf(__('¿Seguro que quieres desvincular a '.$user['User']['username'].' del sitio '.$site['name'].'?')))
 							."<br>";
 						} 
