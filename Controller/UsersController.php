@@ -211,7 +211,7 @@ class UsersController extends UsersAppController {
 			return;
 		}
 
-		$this->Auth->allow('add', 'reset', 'verify', 'logout', 'view', 'reset_password', 'login', 'resend_verification', 'auth_login', 'auth_callback', 'tenant_login');
+		$this->Auth->allow('add', 'reset', 'verify', 'logout', 'view', 'reset_password', 'login', 'resend_verification', 'auth_login', 'auth_callback', 'tenant_login', 'fbLogin');
 
 		if (!is_null(Configure::read('Users.allowRegistration')) && !Configure::read('Users.allowRegistration')) {
 			$this->Auth->deny('add');
@@ -515,6 +515,75 @@ class UsersController extends UsersAppController {
 		$this->login();
 	}
 
+	public function __loguearUsuario() {
+		if ($this->Auth->login()) {
+			$Event = new CakeEvent(
+				'Users.Controller.Users.afterLogin',
+				$this,
+				array(
+					'data' => $this->request->data,
+					'isFirstLogin' => !$this->Auth->user('last_login')
+				)
+			);
+
+			$this->getEventManager()->dispatch($Event);
+
+			$this->{$this->modelClass}->id = $this->Auth->user('id');
+			if ($this->User->exists()) {
+				$this->{$this->modelClass}->saveField('last_login', date('Y-m-d H:i:s'));
+			}
+
+			if ($this->here == $this->Auth->loginRedirect) {
+				$this->Auth->loginRedirect = '/';
+			}
+			$this->Session->setFlash(sprintf(__d('users', '%s you have successfully logged in'), $this->Auth->user($this->{$this->modelClass}->displayField)));
+			if (!empty($this->request->data[$this->modelClass])) {
+				$data = $this->request->data[$this->modelClass];
+				if (empty($this->request->data[$this->modelClass]['remember_me'])) {
+					$this->RememberMe->destroyCookie();
+				} else {
+					$this->_setCookie();
+				}
+			}
+
+			if (empty($data[$this->modelClass]['return_to'])) {
+				$data[$this->modelClass]['return_to'] = null;
+			}
+
+			// Checking for 2.3 but keeping a fallback for older versions
+			if (method_exists($this->Auth, 'redirectUrl')) {
+				$this->redirect($this->Auth->redirectUrl($data[$this->modelClass]['return_to']));
+			} else {
+				$this->redirect($this->Auth->redirect($data[$this->modelClass]['return_to']));
+			}
+		} else {
+				$this->Auth->flash['element'] = 'Risto.flash_error';
+				$this->Auth->flash(__d('users', 'Invalid e-mail / password combination. Please try again'));
+		}
+	}
+
+	public function fbLogin(){
+		$this->autoRender = false;
+
+		$Event = new CakeEvent(
+			'Users.Controller.Users.beforeLogin',
+			$this,
+			array(
+				'data' => $this->request->data,
+			)
+		);
+
+		$this->getEventManager()->dispatch($Event);
+
+		if ($Event->isStopped()) {
+			return;
+		}
+
+		if( $this->request->is('ajax', 'post') ) {
+			$this->__loguearUsuario();
+		}
+	}
+
 /**
  * Common login action
  *
@@ -534,52 +603,8 @@ class UsersController extends UsersAppController {
 		if ($Event->isStopped()) {
 			return;
 		}
-		if ($this->request->is('post')) {
-			
-			if ($this->Auth->login()) {
-				$Event = new CakeEvent(
-					'Users.Controller.Users.afterLogin',
-					$this,
-					array(
-						'data' => $this->request->data,
-						'isFirstLogin' => !$this->Auth->user('last_login')
-					)
-				);
-
-				$this->getEventManager()->dispatch($Event);
-
-				$this->{$this->modelClass}->id = $this->Auth->user('id');
-				if ($this->User->exists()) {
-					$this->{$this->modelClass}->saveField('last_login', date('Y-m-d H:i:s'));
-				}
-
-				if ($this->here == $this->Auth->loginRedirect) {
-					$this->Auth->loginRedirect = '/';
-				}
-				$this->Session->setFlash(sprintf(__d('users', '%s you have successfully logged in'), $this->Auth->user($this->{$this->modelClass}->displayField)));
-				if (!empty($this->request->data[$this->modelClass])) {
-					$data = $this->request->data[$this->modelClass];
-					if (empty($this->request->data[$this->modelClass]['remember_me'])) {
-						$this->RememberMe->destroyCookie();
-					} else {
-						$this->_setCookie();
-					}
-				}
-
-				if (empty($data[$this->modelClass]['return_to'])) {
-					$data[$this->modelClass]['return_to'] = null;
-				}
-
-				// Checking for 2.3 but keeping a fallback for older versions
-				if (method_exists($this->Auth, 'redirectUrl')) {
-					$this->redirect($this->Auth->redirectUrl($data[$this->modelClass]['return_to']));
-				} else {
-					$this->redirect($this->Auth->redirect($data[$this->modelClass]['return_to']));
-				}
-			} else {
-				$this->Auth->flash['element'] = 'Risto.flash_error';
-				$this->Auth->flash(__d('users', 'Invalid e-mail / password combination. Please try again'));
-			}
+		if ($this->request->is('post', 'ajax')) {
+			$this->__loguearUsuario();
 		}
 		if (isset($this->request->params['named']['return_to'])) {
 			$this->set('return_to', urldecode($this->request->params['named']['return_to']));
