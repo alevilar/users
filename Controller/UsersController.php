@@ -211,7 +211,7 @@ class UsersController extends UsersAppController {
 			return;
 		}
 
-		$this->Auth->allow('add', 'reset', 'verify', 'logout', 'view', 'reset_password', 'login', 'resend_verification', 'auth_login', 'auth_callback', 'tenant_login', 'fbLogin');
+		$this->Auth->allow('add', 'reset', 'verify', 'logout', 'view', 'reset_password', 'login', 'resend_verification', 'auth_login', 'auth_callback', 'tenant_login', 'fb_login');
 
 		if (!is_null(Configure::read('Users.allowRegistration')) && !Configure::read('Users.allowRegistration')) {
 			$this->Auth->deny('add');
@@ -562,9 +562,8 @@ class UsersController extends UsersAppController {
 		}
 	}
 
-	public function fbLogin(){
-		$this->autoRender = false;
-
+	public function fb_login(){
+		$user = false;
 		$Event = new CakeEvent(
 			'Users.Controller.Users.beforeLogin',
 			$this,
@@ -578,10 +577,24 @@ class UsersController extends UsersAppController {
 		if ($Event->isStopped()) {
 			return;
 		}
-
 		if( $this->request->is('ajax', 'post') ) {
-			$this->__loguearUsuario();
+			$user = $this->Auth->login();
+			if ( $user ) {
+				$Event = new CakeEvent(
+					'Users.Controller.Users.afterLogin',
+					$this,
+					array(
+						'data' => $user,
+						'isFirstLogin' => !$this->Auth->user('last_login')
+					)
+				);
+
+				$this->getEventManager()->dispatch($Event);
+			}
 		}
+
+		$this->set('user', $user);
+		$this->set('_serialize', array('user'));
 	}
 
 /**

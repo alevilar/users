@@ -4,59 +4,63 @@ echo $this->Html->css('/risto/css/ristorantino/boxlogin_oauth');
 $this->end();
 ?>
 <script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '1479768915624619',
-      xfbml      : true,
-      version    : 'v2.10'
-    });
-    FB.AppEvents.logPageView();
+	window.fbAsyncInit = function() {
+	    FB.init({
+	      appId      : '<?php echo Configure::read("ExtAuth.Provider.Facebook.key")?>',
+	      xfbml      : true,
+	      version    : 'v2.10'
+	    });
+	    //FB.AppEvents.logPageView();
 
-    urlVerificarUsuario = '<?php echo Router::url(array('plugin' => 'users', 'controller' => 'users', 'action' => 'fbLogin')) ?>';
+	    urlVerificarUsuario = "<?php echo Router::url(array('plugin' => 'users', 'controller' => 'users', 'action' => 'fb_login', 'ext'=>'json')) ?>";
 
-    function cuandoSeLoguea(response) {
-	  if (response.status === 'connected') {
-	    userID = response.authResponse.userID;
-		FB.api('/me?fields=first_name, last_name, picture, email, gender', function(response) {
-        user_email = response.email;
-        provider = "Facebook"; //Por el momento va a ser facebook, posteriormente se actualizara gmail.
-        first_name = response.first_name;
-        last_name = response.last_name;
-        gender = response.gender;
+	    function sendAjax(url, data, fnDone){
+	    	$.ajax(urlVerificarUsuario, {
+				type:"POST",
+				data: data
+			})
+			.done(fnDone)
+			.error(function(rta){
+				alert("Ha ocurrido un error, porfavor, intentalo de nuevo o contacta con soporte@paxapos.com");
+			});
+	    }
 
-        
-		$.ajax(urlVerificarUsuario, {
-							type:"POST",
-		    				data:{
-		    					oid: userID,
-		    					email: user_email,
-		    					provider: provider,
-		    					given_name: first_name,
-		    					family_name: last_name,
-		    					gender: gender,
-		    				}
-		    			}).done(function(rta){
-		 					location.href = "/";
-		    			})
-		    			.error(function(rta){
-		    				alert("Ha ocurrido un error, porfavor, intentalo de nuevo o contacta con soporte@paxapos.com");
-		    			});
-        });
+	    function registrarUsuario() {
+			FB.api('/me?fields=first_name, last_name, picture, email, gender, link', function(response) {
 
-	    
+		        sendAjax(urlVerificarUsuario, response, alDone);
+
+		        function alDone(rta){
+		        	console.info("respuesta del ME %o rta: %o", response, rta);
+		        	console.info("2da rta %o", rta);
+					location.href = "/";
+		        }
+	  		});
+	  	}
+
+	    function cuandoSeLoguea(response) {
+			if (response.status === 'connected') {
+				sendAjax(urlVerificarUsuario, response, alDone);
+			} else {
+				alert("error al loguearse: no has iniciado sesión en Facebook");
+			}
+
+			function alDone(rta){
+				console.info("primner rta %o de response %o", rta, response);
+				if (rta && rta.hasOwnProperty("user") && rta.user ) {
+					location.href = "/";
+				} else {
+					registrarUsuario();
+				}
+			}
+		}
 
 
-	  } else {
-	    alert("error al loguearse: no has iniciado sesión en Facebook");
-	  }
-	}
+		$('#fb-login').on('click', function(){
+			FB.login(cuandoSeLoguea,{scope: ['public_profile', 'email']});
+		});
 
-
-	$('#fb-login').on('click', function(){
-		FB.login(cuandoSeLoguea,{scope: ['public_profile', 'email']});
-	});
-
-  };
+	}; // fin fbAsyncInit
 
   (function(d, s, id){
      var js, fjs = d.getElementsByTagName(s)[0];
