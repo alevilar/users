@@ -49,9 +49,11 @@ if ( !isset($adminPanel) ) {
 				<?php } ?>
 
 
-				<td>
 				<?php
 				if ( $adminPanel ) {
+					?>
+				<td>
+					<?php
 					if (array_key_exists('Site', $user)) {
 						$sites = '';
 						foreach ($user['Site'] as $site ) {
@@ -63,9 +65,11 @@ if ( !isset($adminPanel) ) {
 						} 
 						echo trim( $sites, "," );
 					}
+					?>
+				</td>
+					<?php
 				}
 				?>
-				</td>
 
 				<td>
 				<?php
