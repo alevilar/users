@@ -10,6 +10,12 @@ class GenericUser extends AppTenantModel {
 
 
 
+	public $actsAs = array( 
+		'Containable', 
+		'Search.Searchable', 
+		'Risto.Auditable', 
+	);
+
 /**
  * Validation rules
  *
