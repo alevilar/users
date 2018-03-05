@@ -23,14 +23,12 @@ class GenericUser extends AppTenantModel {
  */
 	public $validate = array(
 		'pin' => array(
-			'isUnique' => array(
-				'rule' => array('isUnique'),
-				'message' => 'Este PIN ya está siendo utilizado por otro usuario. Por favor ingresar otro número',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
-			),
+			'rule' => array('esUnicoPeroNoBorrado'),
+			'message' => 'Este PIN ya está siendo utilizado por otro usuario. Por favor ingresar otro número',
+			//'allowEmpty' => false,
+			//'required' => false,
+			//'last' => false, // Stop validation after this rule
+			//'on' => 'create', // Limit validation to 'create' or 'update' operations
 		),
 		'rol_id' => array(
 			'numeric' => array(
@@ -78,5 +76,31 @@ public function listarGenericosConNombreRol() {
 	return Hash::combine($usuariosGenericos, '{n}.GenericUser.id', '{n}.Rol.name');
 
 }
+
+	/**
+	*	Regla de validación que comprueba si el pin es unico, y a su vez, que 
+	*   el campo deleted este en cero, para lanzar mensaje de error avisando
+	*   de que ya existe un usuario generico con ese pin.
+	*	
+	*   @param $pin = el pin del usuario generico a crear.
+	*   @example $pin = array("pin" => 2018);
+	*	
+	*	@return boolean true || false
+	*/
+
+	public function esUnicoPeroNoBorrado($pin) {
+		$existeUsuarioGenerico = $this->find('count', 
+			array(
+				'conditions' => array($pin, 'GenericUser.deleted' => 0),
+				'recursive' => -1
+			)
+		);
+
+		if ($existeUsuarioGenerico > 0) {
+			return false;
+		}
+
+		return true;
+	}
 
 }
