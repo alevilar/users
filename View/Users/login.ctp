@@ -12,11 +12,12 @@
 
 <div class="row">
 	<div class="col-sm-12 center">
-		
+ <?php if(!$this->request->is('mobile')) { ?> 		
 		<h2><?php echo __('Ingresá o Registrate Usando Facebook o Google') ?></h2>
 		<?php
 		// box Login OAUTH
 		echo $this->element('Users.box_oauth_login'); 
+}
 		?>
 
 		<h1><?php echo __('O') ?></h1>

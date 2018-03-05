@@ -24,7 +24,7 @@
 				<?php echo $this->Form->input('email') ?>
 			</p>
 		</fieldset>
-	<?php echo $this->Form->end(__d('users', 'Submit')); ?>
+	<?php echo $this->Form->end(array('class' => 'btn btn-primary', 'label' => 'Guardar')); ?>
 
 
 
@@ -53,11 +53,12 @@
 		?>
 		</ul>
 	<?php } ?>
-
+ <?php if(!$this->request->is('mobile')) { ?> 
 	<h3>Vincular cuentas Sociales</h3>
 	<div class="text-center">
 		<?php echo $this->element('Users.box_oauth_login');?>
 	</div>
+<?php } ?>
 </div>
 
 <?php if ($fb) :?>

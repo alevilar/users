@@ -13,7 +13,7 @@
 		
 		<h3 class="blue">Administradores</h3>
 			<div class="row">
-
+ <?php if(!$this->request->is('mobile')) { ?> 
 				<div class="col-sm-12 center">
 					<h4 class="black-5">Ingresar con</h4>
 					<?php
@@ -21,6 +21,7 @@
 					echo $this->element('Users.box_oauth_login'); 
 					?>
 				</div>
+<?php } ?>
 				<div class="col-sm-12">
 					<br><br>
 					<h4 class="black-5">... o con la cuenta PaxaPos</h4>
