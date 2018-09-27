@@ -854,18 +854,21 @@ class UsersController extends UsersAppController {
 			$user = $this->{$this->modelClass}->passwordReset($this->request->data);
 
 			if (!empty($user)) {
-
-				$Email = $this->_getMailInstance();
-				$Email->to($user[$this->modelClass]['email'])
-					->from($options['from'])
-					->emailFormat($options['emailFormat'])
-					->subject($options['subject'])
-					->template($options['template'], $options['layout'])
-					->viewVars(array(
-					'model' => $this->modelClass,
-					'user' => $this->{$this->modelClass}->data,
-						'token' => $this->{$this->modelClass}->data[$this->modelClass]['password_token']))
-					->send();
+				try {					
+					$Email = $this->_getMailInstance();
+					$Email->to($user[$this->modelClass]['email'])
+						->from($options['from'])
+						->emailFormat($options['emailFormat'])
+						->subject($options['subject'])
+						->template($options['template'], $options['layout'])
+						->viewVars(array(
+						'model' => $this->modelClass,
+						'user' => $this->{$this->modelClass}->data,
+							'token' => $this->{$this->modelClass}->data[$this->modelClass]['password_token']))
+						->send();
+				} catch (Exception $e) {
+					$this->log("ERROR al enviar mails");
+				}
 
 				if ($admin) {
 					$this->Session->setFlash(sprintf(
@@ -1006,7 +1009,6 @@ class UsersController extends UsersAppController {
 	        $user = $this->User->find('first', array(
 	            'conditions' => $conds)
 	        );
-debug($user);
 	        $this->__doAuthLogin($user);
 	}
 
