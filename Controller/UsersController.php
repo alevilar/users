@@ -492,7 +492,11 @@ class UsersController extends UsersAppController {
 					$this->redirect(array('action' => 'login'));
 				}
 
-				$this->_sendVerificationEmail($this->{$this->modelClass}->data);
+				try {
+					$this->_sendVerificationEmail($this->{$this->modelClass}->data);
+				} catch (Exception $e) {
+					$this->log("ERROR al enviar mails:: ".$e->getMessage());
+				}
 				$this->Session->setFlash(__d('users', 'Your account has been created. You should receive an e-mail shortly to authenticate your account. Once validated you will be able to login.', array('class' => 'message big')));
 				$this->redirect(array('action' => 'login'));
 			} else {
@@ -867,7 +871,7 @@ class UsersController extends UsersAppController {
 							'token' => $this->{$this->modelClass}->data[$this->modelClass]['password_token']))
 						->send();
 				} catch (Exception $e) {
-					$this->log("ERROR al enviar mails");
+					$this->log("ERROR al enviar mails:: ".$e->getMessage());
 				}
 
 				if ($admin) {
