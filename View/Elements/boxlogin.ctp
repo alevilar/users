@@ -14,7 +14,7 @@
 		echo $this->Form->input('email',array('placeholder'=>'Email', 'label'=>false));
 		echo $this->Form->input('password', array('type'=>'password','placeholder'=>'Contraseña', 'label'=>false));
 
-	
+		echo $this->Form->input('remember_me', array('type' => 'checkbox', 'label' => 'Recordarme'));
 
 		echo $this->Html->link('Olvidé la contraseña',
 		array('plugin'=>'users', 'controller'=>'users', 'action'=>'reset_password'),
