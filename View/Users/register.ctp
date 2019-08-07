@@ -26,6 +26,11 @@
 			echo $this->Form->input('temppassword', array(
 				'label' => __d('users', 'Password (confirm)'),
 				'type' => 'password'));
+			echo $this->Form->input('paxa_captcha', array(
+                'label' => __d('users', 'Captcha: ¿Cúanto es 7+3?'),
+                'id' => 'PaxaCaptcha',
+                'required' => true,
+                'type' => 'number'));
 			$tosLink = $this->Html->link(__d('users', 'Terms of Service'), array('controller' => 'pages', 'action' => 'tos', 'plugin' => null));
 			echo $this->Form->input('tos', array(
 				'label' => __d('users', 'I have read and agreed to ') . $tosLink));
@@ -33,3 +38,8 @@
 		?>
 	</fieldset>
 </div>
+<?php 
+echo $this->append('script');
+    echo $this->Html->script('Risto.simple_captcha'); 
+echo $this->end();
+?>
