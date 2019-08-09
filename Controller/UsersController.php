@@ -12,6 +12,7 @@
 App::uses('CakeEmail', 'Network/Email');
 App::uses('UsersAppController', 'Users.Controller');
 App::uses('MtSites', 'MtSites.Utility');
+App::uses('HttpSocket', 'Network/Http');
 
 /**
  * Users Users Controller
@@ -479,31 +480,52 @@ class UsersController extends UsersAppController {
 		}
 
 		if (!empty($this->request->data)) {
-			$user = $this->{$this->modelClass}->register($this->request->data);
-			if ($user !== false) {
-				$Event = new CakeEvent(
-					'Users.Controller.Users.afterRegistration',
-					$this,
-					array(
-						'data' => $this->request->data,
-					)
-				);
-				$this->getEventManager()->dispatch($Event);
-				if ($Event->isStopped()) {
-					$this->redirect(array('action' => 'login'));
-				}
+			$HttpSocket = new HttpSocket();
 
-				try {
-					$this->_sendVerificationEmail($this->{$this->modelClass}->data);
-				} catch (Exception $e) {
-					$this->log("ERROR al enviar mails:: ".$e->getMessage());
+			$response_recaptcha = $this->request->data['g-recaptcha-response'];
+
+			$link = 'https://www.google.com/recaptcha/api/siteverify?secret='.RECAPTCHA_SECRET_SITE_ID.'&response='.$response_recaptcha;
+
+			$captcha_result = json_decode($HttpSocket->get($link));
+			$resultado = $captcha_result->success;
+
+			if(!$resultado && !in_array($_SERVER['HTTP_HOST'], array('dev.paxapos.com', 'paxapos.com'))) {
+				//si dio false y estoy en gonza.paxapos.com u otro dominio de desarrollo en el cual no tengo habilitado el reCaptcha, pues que me permita registrar cuenta de todas formas...
+				$resultado = true;
+			}
+
+			if($resultado) {
+
+				$user = $this->{$this->modelClass}->register($this->request->data);
+				if ($user !== false) {
+					$Event = new CakeEvent(
+						'Users.Controller.Users.afterRegistration',
+						$this,
+						array(
+							'data' => $this->request->data,
+						)
+					);
+					$this->getEventManager()->dispatch($Event);
+					if ($Event->isStopped()) {
+						$this->redirect(array('action' => 'login'));
+					}
+
+					try {
+						$this->_sendVerificationEmail($this->{$this->modelClass}->data);
+					} catch (Exception $e) {
+						$this->log("ERROR al enviar mails:: ".$e->getMessage());
+					}
+					$this->Session->setFlash(__d('users', 'Your account has been created. You should receive an e-mail shortly to authenticate your account. Once validated you will be able to login.', array('class' => 'message big')));
+					$this->redirect(array('action' => 'login'));
+				} else {
+					unset($this->request->data[$this->modelClass]['password']);
+					unset($this->request->data[$this->modelClass]['temppassword']);
+					$this->Session->setFlash(__d('users', 'Your account could not be created. Please, try again.'), 'default', array('class' => 'message warning'));
 				}
-				$this->Session->setFlash(__d('users', 'Your account has been created. You should receive an e-mail shortly to authenticate your account. Once validated you will be able to login.', array('class' => 'message big')));
-				$this->redirect(array('action' => 'login'));
 			} else {
 				unset($this->request->data[$this->modelClass]['password']);
 				unset($this->request->data[$this->modelClass]['temppassword']);
-				$this->Session->setFlash(__d('users', 'Your account could not be created. Please, try again.'), 'default', array('class' => 'message warning'));
+				$this->Session->setFlash(__d('users', 'Error en la comprobación del reCaptcha. Por favor, intentelo de nuevo.'), 'default', array('class' => 'message warning'));
 			}
 		}
 	}

@@ -26,20 +26,26 @@
 			echo $this->Form->input('temppassword', array(
 				'label' => __d('users', 'Password (confirm)'),
 				'type' => 'password'));
-			echo $this->Form->input('paxa_captcha', array(
-                'label' => __d('users', 'Captcha: ¿Cúanto es 7+3?'),
-                'id' => 'PaxaCaptcha',
-                'required' => true,
-                'type' => 'number'));
+			echo $this->form->hidden('g-recaptcha-response', array('id' => 'g-recaptcha-response'));
 			$tosLink = $this->Html->link(__d('users', 'Terms of Service'), array('controller' => 'pages', 'action' => 'tos', 'plugin' => null));
 			echo $this->Form->input('tos', array(
 				'label' => __d('users', 'I have read and agreed to ') . $tosLink));
 			echo $this->Form->end(__d('users', 'Submit'));
 		?>
+        <small>This site is protected by reCAPTCHA and the Google 
+            <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+            <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+        </small>
 	</fieldset>
 </div>
 <?php 
 echo $this->append('script');
-    echo $this->Html->script('Risto.simple_captcha'); 
+?>
+  <script src="https://www.google.com/recaptcha/api.js?render=<?php echo RECAPTCHA_SITE_ID ?>"></script>
+  <script type="text/javascript">
+  	var SITE_ID = "<?php echo RECAPTCHA_SITE_ID ?>";
+  </script>
+<?php
+echo $this->Html->script('Risto.simple_captcha');
 echo $this->end();
 ?>
