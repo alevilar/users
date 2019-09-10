@@ -144,7 +144,7 @@ class UsersController extends UsersAppController {
  */
 	public function beforeFilter() {
 		parent::beforeFilter();
-		$this->RememberMe->restoreLoginFromCookie();
+		
 		$this->_setupAuth();
 		$this->_setupPagination();
 
