@@ -515,7 +515,8 @@ class UsersController extends UsersAppController {
 					} catch (Exception $e) {
 						$this->log("ERROR al enviar mails:: ".$e->getMessage());
 					}
-					$this->Session->setFlash(__d('users', 'Your account has been created. You should receive an e-mail shortly to authenticate your account. Once validated you will be able to login.', array('class' => 'message big')));
+					//$this->Session->setFlash(__d('users', 'Your account has been created. You should receive an e-mail shortly to authenticate your account. Once validated you will be able to login.', array('class' => 'message big')));
+					$this->__loguearUsuario();
 					$this->redirect(array('action' => 'login'));
 				} else {
 					unset($this->request->data[$this->modelClass]['password']);
