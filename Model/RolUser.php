@@ -7,6 +7,10 @@ App::uses('RistoTenantAppModel', 'Risto.Model');
  */
 class RolUser extends RistoTenantAppModel {
 
+    public $belongsTo = array(
+        'Users.Rol'
+    );
+
 /**
  * Asigna el rol al usuario. Primero elimina todos los registros de roles_users
  * cuya user_id sea del usuario en cuestión. Luego en un array se pone cada rol_id
