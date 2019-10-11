@@ -101,7 +101,7 @@ class User extends UsersAppModel {
 			'foreignKey' => 'user_id',
 			'associationForeignKey' => 'rol_id',
 			'unique' => 'keepExisting',
-			'conditions' => '',
+			'conditions' => array('RolUser.deleted' => 0),
 			'fields' => '',
 			'order' => '',
 			'limit' => '',
@@ -398,7 +398,8 @@ class User extends UsersAppModel {
 				$this->alias . '.active' => 1,
 				$this->alias . '.email' => $postData[$this->alias]['email'])));
 
-		if (!empty($user) && $user[$this->alias]['email_verified'] == 1) {
+		//if (!empty($user) && $user[$this->alias]['email_verified'] == 1) {
+		if(!empty($user)) {
 			$sixtyMins = time() + 43000;
 			$token = $this->generateToken();
 			$user[$this->alias]['password_token'] = $token;
@@ -406,8 +407,8 @@ class User extends UsersAppModel {
 			$user = $this->save($user, false);
 			$this->data = $user;
 			return $user;
-		} elseif (!empty($user) && $user[$this->alias]['email_verified'] == 0) {
-			$this->invalidate('email', __d('users', 'This Email Address exists but was never validated.'));
+		//} elseif (!empty($user) && $user[$this->alias]['email_verified'] == 0) {
+			//$this->invalidate('email', __d('users', 'This Email Address exists but was never validated.'));
 		} else {
 			$this->invalidate('email', __d('users', 'This Email Address does not exist in the system.'));
 		}
