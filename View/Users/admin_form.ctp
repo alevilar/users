@@ -36,6 +36,9 @@
 				echo $this->Form->input('active', array(
 						'label' => __d('users', 'Active')));
 
+				echo $this->Form->input('email_verified', array(
+						'label' => __d('users', 'Email Verified')));
+
 
 				if ( empty($this->request->data['$model']['tos']) ) {
 					$tosLink = $this->Html->link(__d('users', 'Terms of Service')
