@@ -10,10 +10,10 @@ class GenericUser extends AppTenantModel {
 
 
 
-	public $actsAs = array( 
-		'Containable', 
-		'Search.Searchable', 
-		'Risto.Auditable', 
+	public $actsAs = array(
+		'Containable',
+		'Search.Searchable',
+		'Risto.Auditable',
 	);
 
 /**
@@ -78,18 +78,18 @@ public function listarGenericosConNombreRol() {
 }
 
 	/**
-	*	Regla de validación que comprueba si el pin es unico, y a su vez, que 
+	*	Regla de validación que comprueba si el pin es unico, y a su vez, que
 	*   el campo deleted este en cero, para lanzar mensaje de error avisando
 	*   de que ya existe un usuario generico con ese pin.
-	*	
+	*
 	*   @param $pin = el pin del usuario generico a crear.
 	*   @example $pin = array("pin" => 2018);
-	*	
+	*
 	*	@return boolean true || false
 	*/
 
 	public function esUnicoPeroNoBorrado($pin) {
-		$existeUsuarioGenerico = $this->find('count', 
+		$existeUsuarioGenerico = $this->find('count',
 			array(
 				'conditions' => array($pin, 'GenericUser.deleted' => 0),
 				'recursive' => -1

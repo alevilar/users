@@ -71,7 +71,7 @@ class User extends UsersAppModel {
 			'foreignKey' => 'user_id',
 			'unique' => 'keepExisting',
 			'dependent' => true,
-		),		
+		),
 	);
 
 
@@ -168,7 +168,7 @@ class User extends UsersAppModel {
 				'allowEmpty' => false,
 				'message' => 'Please enter a username.'
 			),
-			
+
 			'unique_username' => array(
 				'rule' => array('isUnique', 'username'),
 				'message' => 'This username is already in use.'
@@ -217,7 +217,7 @@ class User extends UsersAppModel {
  * @param string $ds Datasource
  */
 	public function __construct($id = false, $table = null, $ds = null) {
-		
+
 
 		$this->_setupBehaviors();
 		$this->_setupValidation();
@@ -489,7 +489,7 @@ class User extends UsersAppModel {
 
 		$this->set($postData);
 		$this->validates(); //tuve que hacer pequeñas modificaciones, lee el issue #117 para saber el porque.
-		
+
 		$erroresValidaciones = $this->validationErrors;
 
         if(empty($erroresValidaciones)) {
@@ -504,6 +504,14 @@ class User extends UsersAppModel {
 				'validate' => false,
 				'callbacks' => $this->enableCallbacks));
 			return true;
+		}
+		return false;
+	}
+	
+	public function hashNewPassword($postData = array()) {
+		if(userIsAdmin()) {
+			$postData[$this->alias]['password'] = $this->hash($postData[$this->alias]['password'], null, true);
+			return $postData;
 		}
 		return false;
 	}
@@ -604,10 +612,10 @@ class User extends UsersAppModel {
     public function findById($users) {
 
     	$usernames[] = array($this->find('list',array(
-    		'conditions' => array('id' => $users)))); 
-       
+    		'conditions' => array('id' => $users))));
+
        return $usernames;
-    } 
+    }
 
 /**
  * Checks if an email is already verified and if not renews the expiration time
@@ -968,7 +976,7 @@ class User extends UsersAppModel {
  * @param array $postData controller post data usually $this->data
  * @throws NotFoundException
  * @return mixed True on successfully save else post data as array
- 
+
 	public function edit($userId = null, $postData = null) {
 		debug($this->data);
 		die;
@@ -992,7 +1000,7 @@ class User extends UsersAppModel {
 		}
 	}
 */
-	
+
 /**
  * Gets the user data that needs to be edited
  *
@@ -1070,7 +1078,7 @@ class User extends UsersAppModel {
 
 
 /**
- * 
+ *
  * Returns an array of User id for Searchg Plugin $filterArgs
  *
  * @return array
@@ -1090,7 +1098,7 @@ class User extends UsersAppModel {
     	if ( is_null( $user_id) ) {
     		$user_id = $this->id;
     	}
-    	
+
     	$siteUser['SiteUser']['site_id'] = $site_id;
 		$siteUser['SiteUser']['user_id'] = $user_id;
 		return $this->SiteUser->save($siteUser, array('fieldList', array('SiteUser.site_id', 'SiteUser.user_id')));

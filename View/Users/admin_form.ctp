@@ -32,6 +32,9 @@
 						'label' => __d('users', 'Site')
 						));
 				}
+				
+				echo $this->Form->input('password', array(
+						'label' => __d('users', 'Contraseña')));
 			
 				echo $this->Form->input('active', array(
 						'label' => __d('users', 'Active')));
