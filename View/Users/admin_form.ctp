@@ -34,7 +34,9 @@
 				}
 				
 				echo $this->Form->input('password', array(
-						'label' => __d('users', 'Contraseña')));
+						'label' => __d('users', 'Contraseña'),
+						'required' => false
+				));
 			
 				echo $this->Form->input('active', array(
 						'label' => __d('users', 'Active')));

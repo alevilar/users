@@ -429,6 +429,8 @@ class UsersController extends UsersAppController {
 			unset ( $this->request->data[$this->modelClass]['last_login'] ); 
 			if(!empty($this->request->data[$this->modelClass]['password'])) {
 				$this->request->data = $this->User->hashNewPassword($this->request->data);
+			} else {
+				unset($this->request->data[$this->modelClass]['password']);
 			}
 			if ( $this->User->saveAll($this->request->data) ) {
 				$this->Session->setFlash(__d('users', 'User saved'));
