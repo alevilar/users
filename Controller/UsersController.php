@@ -486,7 +486,6 @@ class UsersController extends UsersAppController {
 
 		if (!empty($this->request->data)) {
 			$HttpSocket = new HttpSocket();
-
 			$response_recaptcha = $this->request->data['g-recaptcha-response'];
 
 			$link = 'https://www.google.com/recaptcha/api/siteverify?secret='.RECAPTCHA_SECRET_SITE_ID.'&response='.$response_recaptcha;

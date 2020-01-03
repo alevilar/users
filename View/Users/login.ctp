@@ -63,7 +63,7 @@
 	<div class="user-login text-center col-md-6 col-sm-12">	
 		<div class="row">
 
-			<div class="col-md-10 col-md-offset-1 bg-red white">
+			<div class="col-md-10 col-md-offset-1 bg-red white signup-modal-trigger">
 				<div class="users form">
 				<h3><?php echo __d('users', 'Abrir nueva cuenta PaxaPos'); ?></h3>
 				<fieldset>
