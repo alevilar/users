@@ -494,7 +494,7 @@ class UsersController extends UsersAppController {
 			$captcha_result = json_decode($HttpSocket->get($link));
 			$resultado = $captcha_result->success;
 
-			if(!$resultado && !in_array($_SERVER['HTTP_HOST'], array('dev.paxapos.com', 'paxapos.com'))) {
+			if(!$resultado && !in_array($_SERVER['HTTP_HOST'], array('dev.paxapos.com', 'paxapos.com', 'www.paxapos.com'))) {
 				//si dio false y estoy en gonza.paxapos.com u otro dominio de desarrollo en el cual no tengo habilitado el reCaptcha, pues que me permita registrar cuenta de todas formas...
 				$resultado = true;
 			}
