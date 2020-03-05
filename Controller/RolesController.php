@@ -42,12 +42,13 @@ class RolesController extends UsersAppController {
 			$this->Rol->create();
 			if ($this->Rol->save($this->request->data)) {
 				$this->Session->setFlash(__('The rol has been saved'),'Risto.flash_success');
-				$this->redirect(array('action' => 'index'));
+				$this->redirect($this->referer());
 			} else {
 				$this->Session->setFlash(__('The rol could not be saved. Please, try again.'),'Risto.flash_error');
 			}
 		}
-                $this->render('edit');
+		$this->set('roles_machine_names', $this->Rol->find('list', array('recursive' => -1, 'fields' => array('machin_name', 'name'))));
+        $this->render('edit');
 	}
 
 /**
@@ -80,18 +81,17 @@ class RolesController extends UsersAppController {
  * @return void
  */
 	public function delete($id = null) {
-		if (!$this->request->is('post')) {
-			throw new MethodNotAllowedException();
-		}
 		$this->Rol->id = $id;
 		if (!$this->Rol->exists()) {
-			throw new NotFoundException(__('Invalid rol'));
+			throw new NotFoundException(__('Invalid Rol Id'));
 		}
 		if ($this->Rol->delete()) {
-			$this->Session->setFlash(__('Rol deleted'),'Risto.flash_success');
-			$this->redirect(array('action' => 'index'));
+			$this->Session->setFlash(__('Usuario Generico Borrado'),'Risto.flash_success');
+			$this->redirect($this->referer());
+		} else {
+			$this->Session->setFlash(__('Error: Usuario Generico No pudo ser borrado'),'Risto.flash_error');
 		}
-		$this->Session->setFlash(__('Rol was not deleted'),'Risto.flash_error');
+
 		$this->redirect(array('action' => 'index'));
 	}
 

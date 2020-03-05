@@ -1,22 +1,16 @@
-<div class="roles form">
+<div class="roles form content-white">
 <?php echo $this->Form->create('Rol');?>
 	<fieldset>
-		<legend><?php echo __('Edit Rol'); ?></legend>
+		<?php if(!empty($this->request->data['Rol']['id'])) { ?>
+			<legend><?php echo __('Editar Usuario Generico'); ?></legend>
+		<?php} else { ?>
+			<legend><?php echo __('Añadir Usuario Generico'); ?></legend>
+		<?php } ?>
 	<?php
 		echo $this->Form->input('id');
-		echo $this->Form->input('name');
-		echo $this->Form->input('machin_name', array('disabled' => true));
+		echo $this->Form->input('name', array('label' => 'Nombre'));
+		echo $this->Form->input('machin_name', array('label' => 'Rol', 'type' => 'select', 'options' => $roles_machine_names));
 	?>
 	</fieldset>
-<?php echo $this->Form->end(__('Submit'));?>
-</div>
-<div class="actions">
-	<h3><?php echo __('Actions'); ?></h3>
-	<ul>
-
-		<li><?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $this->Form->value('Rol.id')), array(), __('Are you sure you want to delete # %s?', $this->Form->value('Rol.id'))); ?></li>
-		<li><?php echo $this->Html->link(__('List Roles'), array('action' => 'index'));?></li>
-		<li><?php echo $this->Html->link(__('List Users'), array('controller' => 'users', 'action' => 'index')); ?> </li>
-		<li><?php echo $this->Html->link(__('New User'), array('controller' => 'users', 'action' => 'add')); ?> </li>
-	</ul>
+<?php echo $this->Form->end(array('label' => 'Guardar', 'class' => 'btn btn-primary btn-lg btn-block'));?>
 </div>

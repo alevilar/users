@@ -2,9 +2,16 @@
 
 
 <div class="content-white">
-<h1 class="center">Usuarios</h1>
+	<div class="row">
+		<div class="col-xs-8 col-xs-offset-2" style="display: inline-block;">
+			<h1 class="center">Usuarios</h1>
+		</div>
+		<div class="col-xs-2">
+			<?php echo $this->Html->link('Crear Usuario', array('plugin' => 'users', 'controller' => 'roles', 'action' => 'add'), array('class' => 'btn btn-primary btn-lg btn-add pull-right')) ?> 
+		</div>
+	</div>
 <div class="row">
-	<div class="col-sm-4 col-sm-offset-4">
+	<div class="col-sm-8 col-sm-offset-4">
 		
 		<table class="table">
 			
@@ -19,21 +26,26 @@
 						<?php } ?>
 					</td>
 					<td>
+						<div class="btn-group">
 						<?php  if ( empty( $user['GenericUser']['id'] ) ) { ?>
 							<?php echo $this->Html->link(
-								'Habilitar Ingreso', array('action' => 'add',  $user['Rol']['id']), array('class'=>'btn-add btn btn-success btn-block')
+								'Habilitar Ingreso', array('action' => 'add',  $user['Rol']['id']), array('class'=>'btn-add btn btn-success')
 								);?>
 						<?php }  else { ?>
-						<div class="btn-group">
 							<?php 
 							echo $this->Html->link(
 								'Modificar PIN', array('action' => 'edit',  $user['Rol']['id'], $user['GenericUser']['id']), array('class' => 'btn-edit btn btn-default')
 								);
 							echo $this->Html->link(
 								__('Remover Ingreso'), array('action' => 'delete', $user['GenericUser']['id'] ), 
-								    array('class' => 'btn btn-danger'), sprintf(__("¿Esta seguro que desea denegar el acceso al usuario generico %s ?", $user['Rol']['name']))
-							    );?>
-						<?php } ?>
+								    array('class' => 'btn btn-warning'), sprintf(__("¿Esta seguro que desea denegar el acceso al usuario generico %s ?", $user['Rol']['name']))
+							    );
+						 } 
+							echo $this->Html->link(
+									__('Eliminar Usuario'), array('plugin' => 'users', 'controller' => 'roles', 'action' => 'delete', $user['Rol']['id'] ), 
+									    array('class' => 'btn btn-danger'), sprintf(__("¿Esta seguro que desea borrar al usuario generico %s ?", $user['Rol']['name']))
+								    );
+						?>
 						</div>
 					</td>
 				</tr>

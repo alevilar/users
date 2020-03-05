@@ -77,7 +77,7 @@ class Rol extends RistoTenantAppModel {
 
         
         public function beforeSave($options = array()) {
-        	if (empty($this->data['Rol']['machin_name'])) {
+        	if (empty($this->data['Rol']['machin_name']) && empty($this->data['Rol']['id'])) {
             	$this->data['Rol']['machin_name'] = strtolower( Inflector::slug( $this->data['Rol']['name'])) ;
         	}
             return true;
