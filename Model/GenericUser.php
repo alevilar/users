@@ -8,14 +8,6 @@ App::uses('AppTenantModel', 'Model');
  */
 class GenericUser extends AppTenantModel {
 
-
-
-	public $actsAs = array(
-		'Containable',
-		'Search.Searchable',
-		'Risto.Auditable',
-	);
-
 /**
  * Validation rules
  *
@@ -55,7 +47,7 @@ class GenericUser extends AppTenantModel {
 			'foreignKey' => 'rol_id',
 			'conditions' => '',
 			'fields' => '',
-			'order' => ''
+			'order' => '',
 		)
 	);
 

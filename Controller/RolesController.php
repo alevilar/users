@@ -47,7 +47,18 @@ class RolesController extends UsersAppController {
 				$this->Session->setFlash(__('The rol could not be saved. Please, try again.'),'Risto.flash_error');
 			}
 		}
-		$this->set('roles_machine_names', $this->Rol->find('list', array('recursive' => -1, 'fields' => array('machin_name', 'name'))));
+		$this->set('roles_machine_names', $this->Rol->find('list', array(
+			'recursive' => -1, 
+			'fields' => array(
+				'machin_name', 
+				'name'
+			), 
+			'conditions' => array(
+				'machin_name !=' => ROL_DUENIO
+			), 
+			'order' => array(
+				'Rol.created' => 'DESC'
+			))));
         $this->render('edit');
 	}
 
@@ -85,7 +96,8 @@ class RolesController extends UsersAppController {
 		if (!$this->Rol->exists()) {
 			throw new NotFoundException(__('Invalid Rol Id'));
 		}
-		if ($this->Rol->delete()) {
+		if ($this->Rol->delete($id, true)) {
+			$this->Rol->GenericUser->deleteAll(array('GenericUser.rol_id' => $id));
 			$this->Session->setFlash(__('Usuario Generico Borrado'),'Risto.flash_success');
 			$this->redirect($this->referer());
 		} else {
