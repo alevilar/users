@@ -12,6 +12,8 @@ class Rol extends RistoTenantAppModel {
  * @var string
  */
 	public $displayField = 'name';
+
+	public $name = 'Rol';
         
 
 
