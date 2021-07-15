@@ -1039,8 +1039,9 @@ class UsersController extends UsersAppController {
 */
 	        // Existing profile? log the associated user in.
 	        $user = $this->User->find('first', array(
-	            'conditions' => $conds)
-	        );
+	            'conditions' => $conds,
+	            'contain' => ['Site', 'SuperRol'],
+	    	));
 	        $this->__doAuthLogin($user);
 	}
 
